@@ -28,7 +28,7 @@ minetest.register_node("oil:gasoline_source", {
 			},
 		},
 	},
-	alpha = 240,
+	use_texture_alpha = "opaque",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -76,7 +76,7 @@ minetest.register_node("oil:gasoline_flowing", {
 			},
 		},
 	},
-	alpha = 240,
+	use_texture_alpha = "opaque",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -122,7 +122,7 @@ minetest.register_node("oil:oil_source", {
 			},
 		},
 	},
-	alpha = 240,
+	use_texture_alpha = "opaque",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -171,7 +171,7 @@ minetest.register_node("oil:oil_flowing", {
 			},
 		},
 	},
-	alpha = 240,
+	use_texture_alpha = "opaque",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -296,7 +296,7 @@ local function form_pump(pos, owner)
 				"list[nodemeta:" .. spos .. ";output;0.5,0.5;2.5,2;0]"..
 				"field[3,0.6;2.5,1;price;Price (minegeld/L);"..price.."]"
 		else
-			
+
 		end
 	return form
 end
@@ -358,9 +358,9 @@ minetest.register_entity("oil:line", {
 		local fp = self.finish
 		if not sp or not fp then self.object:remove() return end
 		if self.laststart and self.lastfinish and vector.equals(self.laststart, sp) and vector.equals(self.lastfinish, fp) then return end
-		
+
 		local dist = vector.distance(sp, fp)
-		if dist > 4 then 
+		if dist > 4 then
 			for name, data in pairs(oil.fueling) do
 				if data.obj == self.object then
 					oil.stopfuel(name)
@@ -372,7 +372,7 @@ minetest.register_entity("oil:line", {
 		local yaw = math.atan2(delta.z, delta.x) - math.pi / 2
 		local pitch = math.atan2(delta.y,  math.sqrt(delta.z*delta.z + delta.x*delta.x))
 		pitch = pitch + math.pi/2
-		
+
 		self.object:move_to({x=(sp.x+fp.x)/2, y=(sp.y+fp.y)/2, z=(sp.z+fp.z)/2, })
 		self.object:set_rotation({x=pitch, y=yaw, z=0})
 		self.object:set_properties({visual_size = {x=.05, y=dist}})
@@ -510,30 +510,30 @@ minetest.register_node("oil:pump", {
 	end,
 	on_timer = function(pos, elapsed)
 		local meta = minetest.get_meta(pos)
-		
+
 		local name = meta:get_string("name")
 		if name == "" then return end
 		local data = oil.fueling[name]
 		if not data then return end
-		
+
 		if not data.obj or data.obj:is_player() then return end
-		
+
 		local ent = data.obj:get_luaentity()
 		if not ent or not ent.finishobj then return end
 		local def = cars_registered_cars[ent.finishobj:get_entity_name()]
 		if not def then return end
 		local carent = ent.finishobj:get_luaentity()
-		
-		local maxgas = def.gas_cap or 50	
+
+		local maxgas = def.gas_cap or 50
 		if not carent.gas then carent.gas = 0 end
 		local gas = meta:get_int("gasbought") or 0
 		if gas == 0 then oil.stopfuel(name) return end
-		
+
 		meta:set_int("gasbought", gas - 1)
 		carent.gas = carent.gas + 1
 		--minetest.chat_send_all(carent.gas)
 		if carent.gas >= maxgas then carent.gas = maxgas oil.stopfuel(name) return end
-		
+
 		return true
 	end
 })
