@@ -1,6 +1,0 @@
-default
-money3
-playercontrol?
-mesecons_button?
-mesecons_luacontroller?
-ontime_clocks?

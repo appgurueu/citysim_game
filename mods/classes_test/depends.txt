@@ -1,4 +1,0 @@
-technic?
-assembler?
-gun_lathe?
-default?

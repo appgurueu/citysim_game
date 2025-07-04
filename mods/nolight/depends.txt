@@ -1,6 +1,0 @@
-default
-technic
-xdecor?
-mesecons?
-mesecons_walllever?
-beamlight
