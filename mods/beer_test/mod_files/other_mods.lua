@@ -2,7 +2,7 @@
 --load configuration file from world folder
 local MODPATH = minetest.get_modpath("beer_test")
 local worldpath = minetest.get_worldpath()
-local config = Settings(worldpath.."beer_test.conf")
+local config = Settings(worldpath.."/beer_test.conf")
 
 local conf_table = config:to_table()
 
