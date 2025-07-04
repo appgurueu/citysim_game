@@ -472,7 +472,7 @@ function getClosest(player, car, distance)
 	playerPos = vector.add(playerPos, offset)
 	if DEBUG_WAYPOINT then 
 		local marker = player:hud_add({
-			hud_elem_type = "waypoint",
+			type = "waypoint",
 			name = "start",
 			number = 0xFF0000,
 			world_pos = playerPos
@@ -497,7 +497,7 @@ function getClosest(player, car, distance)
 	if not punchPos then return end
 		if DEBUG_WAYPOINT then 
 			local marker = player:hud_add({
-				hud_elem_type = "waypoint",
+				type = "waypoint",
 				name = "end",
 				number = 0xFF0000,
 				world_pos = punchPos
@@ -516,7 +516,7 @@ function getClosest(player, car, distance)
 	end
 		if DEBUG_WAYPOINT then 
 			local marker = player:hud_add({
-				hud_elem_type = "waypoint",
+				type = "waypoint",
 				name = "0",
 				number = 0xFF0000,
 				world_pos = vector.add(trunkloc, carPos)
@@ -529,7 +529,7 @@ function getClosest(player, car, distance)
 		loc = vector.multiply({x=x, y=loc.y, z=z}, .1)
 		if DEBUG_WAYPOINT then 
 			local marker = player:hud_add({
-				hud_elem_type = "waypoint",
+				type = "waypoint",
 				name = id,
 				number = 0xFF0000,
 				world_pos = vector.add(loc, carPos)
@@ -1471,7 +1471,7 @@ local function car_step(self, dtime, moveresult)
 				
 				--[[local sparky = minetest.get_player_by_name("sparky")--to help find where the drilling offsets need to be
 				local marker = sparky:hud_add({
-					hud_elem_type = "waypoint",
+					type = "waypoint",
 					name = "start",
 					number = 0xFF0000,
 					world_pos = vector.add(pos, drilloffset)
@@ -1663,7 +1663,7 @@ function car_rightclick(self, clicker, closeid)
 		--add hud for driver
 		if i == 1 then
 			self.hud = clicker:hud_add({
-				 hud_elem_type = "text",
+				 type = "text",
 				 position      = {x = 0.5, y = 0.8},
 				 offset        = {x = 0,   y = 0},
 				 text          = tostring(math.abs(math.floor(self.v*2.23694*10)/10)).." MPH",

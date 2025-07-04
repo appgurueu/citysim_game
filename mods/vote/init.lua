@@ -183,7 +183,7 @@ function vote.update_hud(player)
 	end
 	if not vote.hud:exists(player, "vote:bg") then
 		vote.hud:add(player, "vote:bg", {
-			hud_elem_type = "image",
+			type = "image",
 			position = {x = 1, y = 0.5},
 			scale = {x = bg_scale, y = 1},
 			alignment = {x=-1,y=0},
@@ -197,7 +197,7 @@ function vote.update_hud(player)
 		vote.hud:change(player, "vote:desc", "text", voteset.description .. "?")
 	else
 		vote.hud:add(player, "vote:desc", {
-			hud_elem_type = "text",
+			type = "text",
 			position = {x = 1, y = 0.5},
 			scale = {x = 100, y = 100},
 			alignment = {x=-1,y=0},
@@ -212,7 +212,7 @@ function vote.update_hud(player)
 			vote.hud:change(player, "vote:help", "text", voteset.help)
 		else
 			vote.hud:add(player, "vote:help", {
-				hud_elem_type = "text",
+				type = "text",
 				position = {x = 1, y = 0.5},
 				scale = {x = 100, y = 100},
 				text = voteset.help,

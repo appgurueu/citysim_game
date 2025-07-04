@@ -112,7 +112,7 @@ function medical.gethitloc(player, hitter, tool_capabilities, dir)
 	local local_hitpos = {x=x,y=loc.y,z=z}
 	if DEBUG_WAYPOINT then
 		local marker = hitter:hud_add({
-			hud_elem_type = "waypoint",
+			type = "waypoint",
 			name = "hit",
 			number = 0xFF0000,
 			world_pos = hitpos
@@ -173,7 +173,7 @@ function medical.getlimb(player, hitter, tool_capabilities, dir, hitloc)
 		end
 		if DEBUG_WAYPOINT then 
 			local mrker = hitter:hud_add({
-				hud_elem_type = "waypoint",
+				type = "waypoint",
 				name = id,
 				number = 0xFF0000,
 				world_pos = adj_pos

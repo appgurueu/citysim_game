@@ -303,7 +303,7 @@ local hudtimers = {}
 local function add_hud(player, pos, name)
 	local playername = player:get_player_name()
 	local marker = player:hud_add({
-		hud_elem_type = "waypoint",
+		type = "waypoint",
 		name = name,
 		number = 0xFF0000,
 		world_pos = pos

@@ -281,7 +281,7 @@ minetest.register_globalstep(function(dtime)
 			if not player then gaseffecttbl[name] = nil gashuds[name] = nil return end
 			if not gashuds[name] then
 				gashuds[name] = player:hud_add({
-					hud_elem_type = "image",
+					type = "image",
 					position = {x = 0.5, y = 0.5},
 					scale = {
 						x = -100,

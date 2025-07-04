@@ -7,7 +7,7 @@ local function start_unconscious(player)
 		medical.data[name].unconscious = {yaw = player:get_look_horizontal()}
 		if not minetest.get_modpath("hudbars") then
 			medical.data[name].unconscious.hud = player:hud_add({
-				 hud_elem_type = "text",
+				 type = "text",
 				 position      = {x = 0.5, y = 0.7},
 				 offset        = {x = 0,   y = 0},
 				 text          = tostring(medical.data[name].hp or "nil").." hp",
@@ -247,7 +247,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				player:hud_change(medical.data[name].unconscious.hud, "text", tostring(md.hp or "nil").." hp")
 			elseif medical.data[name].unconscious and not medical.data[name].unconscious.hud then
 				medical.data[name].unconscious.hud = player:hud_add({
-					 hud_elem_type = "text",
+					 type = "text",
 					 position      = {x = 0.5, y = 0.7},
 					 offset        = {x = 0,   y = 0},
 					 text          = tostring(medical.data[name].hp or "nil").." hp",

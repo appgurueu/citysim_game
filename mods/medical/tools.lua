@@ -31,7 +31,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 	if hitpart == "breath" then
 		if medical.hud[cname] then clicker:hud_remove(medical.hud[cname]) medical.hud[cname] = nil end
 		medical.hud[cname] = clicker:hud_add({
-			hud_elem_type = "image",
+			type = "image",
 			position  = {x = 0.5, y = 0.55},
 			offset    = {x = 0, y = 0},
 			text      = "nopulse.png",
@@ -62,7 +62,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 					})
 				end
 				local circle = clicker:hud_add({
-					hud_elem_type = "image",
+					type = "image",
 					position  = {x = 0.5, y = 0.55},
 					offset    = {x = 0, y = 0},
 					text      = "foundpulse.png",
@@ -94,7 +94,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 		end
 		if medical.hud[cname] then clicker:hud_remove(medical.hud[cname]) medical.hud[cname] = nil end
 		medical.hud[cname] = clicker:hud_add({
-			hud_elem_type = "image",
+			type = "image",
 			position  = {x = 0.5, y = 0.55},
 			offset    = {x = 0, y = 0},
 			text      = "nopulse.png^"..temptex,
@@ -112,7 +112,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 					gain = (hp+100)/120
 				})
 				local circle = clicker:hud_add({
-					hud_elem_type = "image",
+					type = "image",
 					position  = {x = 0.5, y = 0.55},
 					offset    = {x = 0, y = 0},
 					text      = "foundpulse.png^[opacity:"..(((hp+100)/120)*255),
@@ -183,7 +183,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 			clicker:hud_remove(medical.hud[cname])
 		end
 		medical.hud[cname] = medical.add_anim_hud(clicker, {
-			hud_elem_type = "image",
+			type = "image",
 			position  = {x = 0.5, y = 0.55},
 			offset    = {x = 0, y = 0},
 			scale     = { x = 10, y = 10},
@@ -205,7 +205,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 			if medical.hud[cname] then
 				medical.remove_anim_hud(clicker, medical.hud[cname])
 				medical.hud[cname] = medical.add_anim_hud(clicker, {
-					hud_elem_type = "image",
+					type = "image",
 					position  = {x = 0.5, y = 0.55},
 					offset    = {x = 0, y = 0},
 					scale     = { x = 10, y = 10},
@@ -228,7 +228,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 			tex = "breathfail.png"
 		end
 		medical.hud[cname] = medical.add_anim_hud(clicker, {
-			hud_elem_type = "image",
+			type = "image",
 			position  = {x = 0.5, y = 0.55},
 			offset    = {x = 0, y = 0},
 			scale     = { x = 10, y = 10},
@@ -250,7 +250,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 			if medical.hud[cname] then
 				medical.remove_anim_hud(clicker, medical.hud[cname])
 				medical.hud[cname] = medical.add_anim_hud(clicker, {
-					hud_elem_type = "image",
+					type = "image",
 					position  = {x = 0.5, y = 0.55},
 					offset    = {x = 0, y = 0},
 					scale     = { x = 10, y = 10},
@@ -270,7 +270,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 	--[[for _,obj in ipairs(all_objects) do
 		local pos = obj:get_pos()
 		local marker = clicker:hud_add({
-			hud_elem_type = "waypoint",
+			type = "waypoint",
 			name = obj:get_entity_name(),
 			number = 0xFF0000,
 			world_pos = obj:get_pos()
@@ -440,7 +440,7 @@ medical.attachedtools["medical:bpcuff"] = function(self, clicker, wielditem, hit
 	local obj = minetest.add_entity(pos, "medical:bpcuff", clicker:get_player_name())
 	minetest.after(0, function()
 		local marker = clicker:hud_add({
-			hud_elem_type = "waypoint",
+			type = "waypoint",
 			name = "hit",
 			number = 0xFF0000,
 			world_pos = obj:get_pos()

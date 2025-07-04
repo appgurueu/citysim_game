@@ -160,7 +160,7 @@ local function do_HSL_formspec(player, name, fields)
 			player:hud_change(hudpreview[name], "number", "0x"..previewcolor[name])
 		else
 			hudpreview[name] = player:hud_add({
-				hud_elem_type = "text",
+				type = "text",
 				scale = {x=-100, y=-100},
 				text = "███████████",
 				number = "0x"..previewcolor[name],

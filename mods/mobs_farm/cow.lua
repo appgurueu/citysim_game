@@ -298,7 +298,7 @@ mobs:register_mob("mobs_farm:cow", {
 			end
 			--[[for i, player in pairs(minetest.get_connected_players()) do
 				local marker = player:hud_add({
-						hud_elem_type = "waypoint",
+						type = "waypoint",
 						name = "",
 						number = 0xFF0000,
 						world_pos = self.herdpos

@@ -181,7 +181,7 @@ local function add_gun(name, gunname)
 		scale = scale * scalepref[name]
 	end
 	gun_huds[name].hud = player:hud_add({
-		hud_elem_type = "image_waypoint",
+		type = "image_waypoint",
 		scale = {x=scale, y=scale},
 		text = "invis.png",
 		alignment = {x=0,y=0},
@@ -193,7 +193,7 @@ local function add_gun(name, gunname)
 	-- It was fixed in https://github.com/luanti-org/luanti/commit/4e6e8b7bf1c4a60c6d2f630367862a8645ccbf0c
 	local hotbar_placement_fixed = core.get_player_information(name).protocol_version >= 46
 	gun_huds[name].hotbar = player:hud_add({
-		hud_elem_type = "inventory",
+		type = "inventory",
 		text = "main",
 		number = 8,
 		alignment = hotbar_placement_fixed and {x = 0, y = -1} or {x = 0, y = 0},
@@ -464,7 +464,7 @@ local function fire(player, def, itemstack)
 					end
 					--[[
 					local marker = player2:hud_add({
-							hud_elem_type = "waypoint",
+							type = "waypoint",
 							name = "closepoint",
 							number = 0xFF0000,
 							world_pos = nearPoint

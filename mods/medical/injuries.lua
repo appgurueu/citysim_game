@@ -106,7 +106,7 @@ function medical.injury_handle(player, clicker, rightclick, tool, hitlimb, finis
 	local stoparg
 	if stepdef.hud then
 		local huddef = {
-			hud_elem_type = "image",
+			type = "image",
 			position  = {x = 0.5, y = 0.55},
 			offset    = {x = 0, y = 0},
 			scale     = { x = 10, y = 10},

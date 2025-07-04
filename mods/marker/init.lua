@@ -48,7 +48,7 @@ register_chatcommands({"mrkr", "marker"}, {
 
 		-- Create the waypoint.
 		marker[name] = player:hud_add({
-			hud_elem_type = "waypoint",
+			type = "waypoint",
 			name = pos[1]..", "..pos[2]..", "..pos[3],
 			number = 0xFF0000,
 			world_pos = pos
