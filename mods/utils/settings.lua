@@ -139,7 +139,7 @@ end
 -- @return The pos with the given name, or the default value if it is nil,
 --         or nil.
 function settings.get_pos3d(name, default_value)
-	local value = minetest.setting_get_pos(name)
+	local value = minetest.settings:get_pos(name)
 	
 	if value ~= nil then
 		return value

@@ -26,7 +26,7 @@ local function setting(name, default)
 	if minetest.settings then
 		value = minetest.settings:get("money3." .. name)
 	else
-		setting = minetest.setting_get("money3." .. name)
+		setting = minetest.settings:get("money3." .. name)
 	end
 
 	if value and type(default) == "number" then
@@ -46,7 +46,7 @@ local function setting_bool(name, default)
 	if minetest.settings then
 		value = minetest.settings:get_bool("money3." .. name)
 	else
-		value = minetest.setting_getbool("money3." .. name)
+		value = minetest.settings:get_bool("money3." .. name)
 	end
 
 	if value == nil then

@@ -214,7 +214,7 @@ else
 				end
 			end
 		end
-		if not minetest.setting_getbool("creative_mode") then
+		if not minetest.settings:get_bool("creative_mode") then
 			local tool_name = itemstack:get_name()
 			itemstack:add_wear(65535/(uses-1))
 			if itemstack:get_wear() == 0 and minetest.get_modpath("invtweak") then

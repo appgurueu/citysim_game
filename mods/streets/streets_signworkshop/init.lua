@@ -119,7 +119,7 @@ function streets.signworkshop.update_formspec(pos)
 		fs = fs .. "button[2.25,4;1,1;prevpage;<-]"
 		fs = fs .. "button[5.25,4;1,1;nextpage;->]"
 		fs = fs .. "label[3.75,4;" .. string.format("Page %s of %s", page, maxpage) .. "]"
-		if minetest.setting_getbool("creative_mode") then
+		if minetest.settings:get_bool("creative_mode") then
 			fs = fs .. "label[0,3.5;CREATIVE MODE\nTaking templates\nis enabled]"
 		end
 	end
@@ -201,7 +201,7 @@ local function on_construct(pos)
 end
 
 local function allow_metadata_inventory_take(pos, listname, index, stack, player)
-	if listname == "output" or listname == "surface" or listname == "dye" or (listname == "list" and minetest.setting_getbool("creative_mode")) then
+	if listname == "output" or listname == "surface" or listname == "dye" or (listname == "list" and minetest.settings:get_bool("creative_mode")) then
 		return stack:get_count()
 	else
 		return 0
@@ -236,7 +236,7 @@ end
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	if listname == "dye" and stack:get_name():sub(1, 4) == "dye:" then
 		return stack:get_count()
-	elseif (listname == "surface" and stack:get_name() == "streets:sign_blank") or (listname == "list" and minetest.setting_getbool("creative_mode")) then
+	elseif (listname == "surface" and stack:get_name() == "streets:sign_blank") or (listname == "list" and minetest.settings:get_bool("creative_mode")) then
 		return stack:get_count()
 	else
 		return 0

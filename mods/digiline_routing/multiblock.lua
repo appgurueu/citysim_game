@@ -35,7 +35,7 @@ digiline_routing.multiblock.build2 = function(node1, node2, itemstack, placer, p
 	digiline:update_autoconnect(pos)
 	digiline:update_autoconnect(botpos)
 
-	if not minetest.setting_getbool("creative_mode") then
+	if not minetest.settings:get_bool("creative_mode") then
 		itemstack:take_item()
 	end
 	return itemstack, true

@@ -11,7 +11,7 @@ local function setting(name, tp, default)
 	elseif tp == "string" then
 		value = minetest.settings:get(full_name)
 	elseif tp == "v3f" then
-		value = minetest.setting_get_pos(full_name)
+		value = minetest.settings:get_pos(full_name)
 		default = value == nil and minetest.string_to_pos(default)
 	elseif tp == "float" or tp == "int" then
 		value = tonumber(minetest.settings:get(full_name))

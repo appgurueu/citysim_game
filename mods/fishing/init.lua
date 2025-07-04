@@ -18,7 +18,7 @@ local path = minetest.get_modpath("fishing").."/"
 
 fishing_setting = {}
 fishing_setting.func = {}
-fishing_setting.is_creative_mode = minetest.setting_getbool("creative_mode")
+fishing_setting.is_creative_mode = minetest.settings:get_bool("creative_mode")
 fishing_setting.file_settings = minetest.get_worldpath() .. "/fishing_config.txt"
 fishing_setting.file_trophies = minetest.get_worldpath() .. "/fishing_trophies.txt"
 fishing_setting.file_contest = minetest.get_worldpath() .. "/fishing_contest.txt"
