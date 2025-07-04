@@ -67,7 +67,7 @@ if config:get("enable_default") == "true"  then
 
 end
 ---------------
--- bees mod -- 
+-- bees mod --
 ------------------------------
 -- This is for the bees mod --
 
@@ -86,7 +86,7 @@ end
 
 
 -----------------
--- candles mod -- 
+-- candles mod --
 ----------------------------
 -- (broken do not enable) --
 --[[
@@ -96,9 +96,3 @@ end
 		recipe = {"default:apple","default:apple","default:apple","default:apple","beer_test:yeast","candles:honey","candles:honey","candles:honey","candles:honey"},
 	})
 ]] --
-
-
-print("Beer_test:other_mods.lua                     [ok]")
-
-
-

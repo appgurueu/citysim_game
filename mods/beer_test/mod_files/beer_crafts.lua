@@ -1,10 +1,10 @@
 
 --------------------
 -- general crafts --
--------------------- 
+--------------------
 
--- tankards crafts -- 
- 
+-- tankards crafts --
+
  minetest.register_craft({
 	output = "beer_test:tankard",
 	recipe = {
@@ -62,7 +62,7 @@
 
 
 
--- malt grain crafts -- 
+-- malt grain crafts --
 
  minetest.register_craft({
 	type = "shapeless",
@@ -305,7 +305,7 @@ if maxp.y >= 2 and minp.y <= 0 then
 					break
 				end
 			end
-			
+
 			if ground_y then
 				local p = {x=x,y=ground_y+1,z=z}
 				local nn = minetest.get_node(p).name
@@ -324,10 +324,3 @@ if maxp.y >= 2 and minp.y <= 0 then
 	end
 end
 end)
-
-
-	
-print("Beer_test: beer_crafts.lua                     [ok]")
-
-
-

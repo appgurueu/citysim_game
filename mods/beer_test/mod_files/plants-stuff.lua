@@ -34,7 +34,7 @@ minetest.register_node("beer_test:growing_rope", {
 			end
 		end
 	})
-	
+
 	minetest.register_node("beer_test:growing_rope_down", {
 	description = "Growing rope",
 	drawtype = "nodebox",
@@ -59,9 +59,9 @@ minetest.register_node("beer_test:growing_rope", {
 			{-0.1, -0.5, -0.1, 0.1, 0.5, 0.1}, -- side f
 		},
 	},
-	
+
 	})
-	
+
 minetest.register_node("beer_test:growing_rope_1", {
 	description = "Growing rope",
 	drawtype = "nodebox",
@@ -110,11 +110,11 @@ drawtype = "nodebox",
 	node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f 
-				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f 
-				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f 
+				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f
+				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f
+				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f
 				{-0.1, -0.5, -0.1, 0.1, 0.5, 0.1}, -- side f
 
 			},
@@ -142,11 +142,11 @@ drawtype = "nodebox",
 	node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f 
-				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f 
-				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f 
+				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f
+				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f
+				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f
 				{-0.1, -0.5, -0.1, 0.1, 0.5, 0.1}, -- side f
 
 			},
@@ -208,10 +208,3 @@ minetest.register_abm({
 		end
 	end,
 })
-
----------------
--- overrides --
----------------
-
-
-print("Beer_test: plants-stuff.lua             [ok]")

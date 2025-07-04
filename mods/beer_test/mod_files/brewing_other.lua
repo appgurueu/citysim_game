@@ -4,7 +4,7 @@
 minetest.register_craftitem("beer_test:barrle_tap", {
 	description = "Barrel Tap",
 	inventory_image = "default_paper.png",
-}) 
+})
 ]] --
 -----------------
 -- beer barrle --
@@ -26,21 +26,21 @@ minetest.register_node("beer_test:barrel", {
 			minetest.env:set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_beer_grain"))
 		end
-			
+
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:mixed_ale_grain" then
 			node.name = "beer_test:barrel_mixed_ale_grain"
 			minetest.env:set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_ale_grain"))
-			
+
 		end
-		
+
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:mixed_mead_grain" then
 			node.name = "beer_test:barrel_mixed_mead_grain"
 			minetest.env:set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_mead_grain"))
-			
+
 		end
 	end,
     on_construct = function(pos)
@@ -55,7 +55,7 @@ minetest.register_node("beer_test:barrel", {
             {-0.5, -0.5, -0.5, -0.35, 0.5, 0.5}, -- side l
             {0.35, -0.5, -0.5, 0.5, 0.5, 0.5},  -- side r
             {-0.5, -0.5, -0.35, 0.5, 0.5, -0.5}, -- frount
-             
+
         },
     },
     selection_box = {
@@ -63,8 +63,8 @@ minetest.register_node("beer_test:barrel", {
         fixed = {
             {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
         },
-    }, 
-		
+    },
+
 })
 
 -- tankard --
@@ -93,7 +93,7 @@ minetest.register_node("beer_test:tankard", {
 			{-0.15, -0.0, 0.04, -0.35 , 0.05, -0.05},
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -127,7 +127,7 @@ minetest.register_node("beer_test:barrel_rum", {
          local meta = minetest.get_meta(pos)
          meta:set_string("infotext", "Rum (Brewed)")
       end,
-    
+
    on_punch = function(pos, node, puncher)
       local tool = puncher:get_wielded_item():get_name()
       if tool and tool == "beer_test:tankard" then
@@ -136,7 +136,7 @@ minetest.register_node("beer_test:barrel_rum", {
          puncher:get_inventory():remove_item("main", ItemStack("beer_test:tankard"))
          puncher:get_inventory():add_item("main", ItemStack("beer_test:tankard_rum"))
       end
-   end  
+   end
 })
 
 -- tankards rum --
@@ -167,7 +167,7 @@ minetest.register_node("beer_test:tankard_rum", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.18, -0.5, -0.18, 0.18, 0.1, 0.18},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -201,7 +201,7 @@ minetest.register_node("beer_test:barrel_moonsine", {
          local meta = minetest.get_meta(pos)
          meta:set_string("infotext", "Moonsine (Brewed)")
       end,
-    
+
    on_punch = function(pos, node, puncher)
       local tool = puncher:get_wielded_item():get_name()
       if tool and tool == "beer_test:tankard" then
@@ -210,7 +210,7 @@ minetest.register_node("beer_test:barrel_moonsine", {
          puncher:get_inventory():remove_item("main", ItemStack("beer_test:tankard"))
          puncher:get_inventory():add_item("main", ItemStack("beer_test:tankard_moonsine"))
       end
-   end  
+   end
 })
 
 -- tankards rum --
@@ -241,7 +241,7 @@ minetest.register_node("beer_test:tankard_moonsine", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.18, -0.5, -0.18, 0.18, 0.1, 0.18},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -275,7 +275,7 @@ minetest.register_node("beer_test:barrel_mulledWine", {
          local meta = minetest.get_meta(pos)
          meta:set_string("infotext", "Mulled Wine (Brewed)")
       end,
-    
+
    on_punch = function(pos, node, puncher)
       local tool = puncher:get_wielded_item():get_name()
       if tool and tool == "beer_test:tankard" then
@@ -284,7 +284,7 @@ minetest.register_node("beer_test:barrel_mulledWine", {
          puncher:get_inventory():remove_item("main", ItemStack("beer_test:tankard"))
          puncher:get_inventory():add_item("main", ItemStack("beer_test:tankard_mulledWine"))
       end
-   end  
+   end
 })
 
 -- tankards rum --
@@ -315,7 +315,7 @@ minetest.register_node("beer_test:tankard_mulledWine", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.18, -0.5, -0.18, 0.18, 0.1, 0.18},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -332,6 +332,3 @@ minetest.register_node("beer_test:tankard_mulledWine", {
 		},
 	},
 })
-
-
-print("Beer_test: brewing_other.lua            [ok]")

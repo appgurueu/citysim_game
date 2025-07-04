@@ -10,10 +10,10 @@ local function place_seed(itemstack, placer, pointed_thing, plantname)
 	if pt.type ~= "node" then
 		return
 	end
-	
+
 	local under = minetest.get_node(pt.under)
 	local above = minetest.get_node(pt.above)
-	
+
 	-- return if any of the nodes is not registered
 	if not minetest.registered_nodes[under.name] then
 		return
@@ -21,22 +21,22 @@ local function place_seed(itemstack, placer, pointed_thing, plantname)
 	if not minetest.registered_nodes[above.name] then
 		return
 	end
-	
+
 	-- check if pointing at the top of the node
 	if pt.above.y ~= pt.under.y+1 then
 		return
 	end
-	
+
 	-- check if you can replace the node above the pointed node
 	if not minetest.registered_nodes[above.name].buildable_to then
 		return
 	end
-	
+
 	-- check if pointing at soil
 	if minetest.get_item_group(under.name, "soil") <= 1 then
 		return
 	end
-	
+
 	-- add the node and remove 1 item from the itemstack
 	minetest.add_node(pt.above, {name=plantname})
 	if not minetest.setting_getbool("creative_mode") then
@@ -50,7 +50,7 @@ end
 minetest.register_craftitem("beer_test:seed_hops", {
 	description = "hops Seed",
 	inventory_image = "beer_test_hops_seed.png",
-	
+
 })
 
 minetest.register_node("beer_test:hops", {
@@ -86,12 +86,12 @@ minetest.register_node("beer_test:hops_dried_2", {
 	sounds = default.node_sound_leaves_defaults(),
 })
 
- 
+
 minetest.register_node("beer_test:hops_grow", {
 	walkable = false,
 	description = "Dryed Hops",
 	paramtype = "light",
-	drawtype = "plantlike",	
+	drawtype = "plantlike",
 	drop = {
 		max_items = 7,
 		items = {
@@ -107,7 +107,7 @@ minetest.register_node("beer_test:hops_grow", {
 	tiles = {"beer_test_hops_8.png"},
 	groups = {snappy=3, flammable=2},
 	sounds = default.node_sound_leaves_defaults(),
-	
+
 	on_punch = function(pos, node, puncher)
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:crop" then
@@ -155,7 +155,7 @@ minetest.register_abm({
 		if minetest.get_item_group(node.name, "hops") == 8 then
 			return
 		end
-		
+
 		-- check if on wet soil
 		pos.y = pos.y-1
 		local n = minetest.get_node(pos)
@@ -163,7 +163,7 @@ minetest.register_abm({
 			return
 		end
 		pos.y = pos.y+1
-		
+
 		-- check light
 		if not minetest.get_node_light(pos) then
 			return
@@ -171,15 +171,15 @@ minetest.register_abm({
 		if minetest.get_node_light(pos) < 13 then
 			return
 		end
-		
+
 		-- grow
 		local height = minetest.get_item_group(node.name, "hops") + 1
 		minetest.set_node(pos, {name="beer_test:hops_"..height})
 	end
 })
 
- -- drying hops -- 
- 
+ -- drying hops --
+
 minetest.register_abm({
 	nodenames = {"beer_test:hops", "beer_test:hops_dried_1"},
 	interval = 15,
@@ -257,7 +257,7 @@ fertility = {"grassland"}
 minetest.register_craftitem("beer_test:seed_oats", {
 	description = "oat Seed",
 	inventory_image = "beer_test_oats_seed.png",
-	
+
 })
 
 -- oats growing --
@@ -300,7 +300,7 @@ minetest.register_abm({
 		if minetest.get_item_group(node.name, "oats") == 8 then
 			return
 		end
-		
+
 		-- check if on wet soil
 		pos.y = pos.y-1
 		local n = minetest.get_node(pos)
@@ -308,7 +308,7 @@ minetest.register_abm({
 			return
 		end
 		pos.y = pos.y+1
-		
+
 		-- check light
 		if not minetest.get_node_light(pos) then
 			return
@@ -316,7 +316,7 @@ minetest.register_abm({
 		if minetest.get_node_light(pos) < 13 then
 			return
 		end
-		
+
 		-- grow
 		local height = minetest.get_item_group(node.name, "oats") + 1
 		minetest.set_node(pos, {name="beer_test:oats_"..height})
@@ -366,11 +366,11 @@ description = "Wild hops",
 	node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f 
-				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f 
-				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f 
-				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f 
+				{-0.2, -0.5, -0.2, 0.2, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, 0.2, 0.3, 0.5, 0.2}, -- side f
+				{-0.3, -0.5, -0.2, 0.3, 0.5, -0.2}, -- side f
+				{-0.2, -0.5, 0.3, -0.2, 0.5, -0.3}, -- side f
+				{0.2, -0.5, 0.3, 0.2, 0.5, -0.3}, -- side f
 				{-0.1, -0.5, -0.1, 0.1, 0.5, 0.1}, -- side f
 
 			},
@@ -398,7 +398,7 @@ minetest.register_node("beer_test:crop", {
 	tiles = {"beer_test_crop.png"},
 	groups = {chopspy=3, oddly_breakable_by_hand=3, flammable=2, plant=1},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_punch = function(pos, node, puncher)
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:seed_hops" then
@@ -406,19 +406,13 @@ minetest.register_node("beer_test:crop", {
 			minetest.env:set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:seed_hops"))
 		end
-			
+
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:seed_oats" then
 			node.name = "beer_test:oats_1"
 			minetest.env:set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:seed_oats"))
-			
+
 		end
-	end		
+	end
 })
-
--- 
-
-
-
- print("Beer_test: plants.lua                   [ok]")

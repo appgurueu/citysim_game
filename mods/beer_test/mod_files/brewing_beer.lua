@@ -1,5 +1,5 @@
 
--- the beer barrels -- 
+-- the beer barrels --
 
 minetest.register_node("beer_test:barrel_mixed_beer_grain", {
     description = "Barrel (With Mixed Beer Grain)",
@@ -23,7 +23,7 @@ minetest.register_node("beer_test:barrel_mixed_beer_grain", {
             {0.35, -0.5, -0.5, 0.5, 0.5, 0.5},  -- side r
             {-0.5, -0.5, -0.35, 0.5, 0.5, -0.5}, -- frount
 			 {-0.5, -0.5, -0.5, 0.5, 0.1, 0.5},
-             
+
         },
     },
     selection_box = {
@@ -32,7 +32,7 @@ minetest.register_node("beer_test:barrel_mixed_beer_grain", {
             {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
         },
     },
-    --i think using on rightclick is much better then onpunch, because all things in minetest are used/placed with righclick       
+    --i think using on rightclick is much better then onpunch, because all things in minetest are used/placed with righclick
     on_rightclick = function(pos, node, player, itemstack, pointed_thing)
         if itemstack:get_name() == "default:wood" then --//check with tool/item is used on rightclick
         itemstack:take_item(1); --//and remove one if its the correct one
@@ -71,17 +71,16 @@ beer.punched =function(pos, node, puncher)
       local tool = puncher:get_wielded_item():get_name()
 	  local meta = minetest.get_meta(pos);
       if tool and tool == "beer_test:tankard" then
-	  print(meta:get_int("full"))
 		if meta:get_int("full") >=5 then
 			local state = meta:get_int("state")
 			if state == 0 then state = 1
 			end
-			local beer_tankardItem = beer.brewing[state].beer_tankard 
-			puncher:set_wielded_item(ItemStack(beer_tankardItem)) 
-			--puncher:set_wielded_item(ItemStack("beer_test:tankard_beer")) -- exactly replace the item wich was used. (old part) 
+			local beer_tankardItem = beer.brewing[state].beer_tankard
+			puncher:set_wielded_item(ItemStack(beer_tankardItem))
+			--puncher:set_wielded_item(ItemStack("beer_test:tankard_beer")) -- exactly replace the item wich was used. (old part)
 			newFull = meta:get_int("full")-5;
 			meta:set_int("full",newFull);
-			
+
 			meta:set_string("infotext",beer.brewing[state].name .. "\n("..newFull.."% full)" )--//update the infotext
 			if newFull <= 0 then
 				node.name = "beer_test:barrel";
@@ -90,15 +89,15 @@ beer.punched =function(pos, node, puncher)
 		else
 			minetest.chat_send_player(puncher:get_player_name(),"barrel is empty :-(\ngo brew a new one!")
 		end
-		
+
       end
-   end  
-   
+   end
+
 beer.dug = function(pos, node, digger)
 	local meta = minetest.get_meta(pos);
 	local t = meta:to_table();
 	if not(t and t.fields and t.fields.state) then
-		minetest.set_node(pos, {name="air"});		
+		minetest.set_node(pos, {name="air"});
 		return
 	end
 	local state = meta:get_int("state");
@@ -116,7 +115,7 @@ end
 beer.place = function(itemstack, placer, pointed_thing)
 	if pointed_thing.above then
 		pos = pointed_thing.above --needs to be improved
-	else 
+	else
 		pos = pointed_thing;
 	end
 	minetest.set_node(pos, {name="beer_test:barrel_beer_brewed"});
@@ -165,7 +164,7 @@ minetest.register_node("beer_test:barrel_beer_brewing", {
 		end
 		local timer = minetest.get_node_timer(pos);
 		timer:stop();--//then stop the timer
-		
+
 		node.name = "beer_test:barrel_beer_brewed";
 		minetest.swap_node(pos,node)
 		meta:set_int("full",100);
@@ -180,7 +179,7 @@ minetest.register_node("beer_test:barrel_beer_brewed", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2,not_in_creative_inventory=1},
-	drop = "", 
+	drop = "",
 	sounds = default.node_sound_barrel_defaults(),
 	on_punch = beer.punched,
 	on_dig = beer.dug,
@@ -324,7 +323,7 @@ minetest.register_node("beer_test:tankard_unbrewed_beer", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.18, -0.5, -0.18, 0.18, 0.1, 0.18},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -369,7 +368,7 @@ minetest.register_node("beer_test:tankard_light_beer", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.18, -0.5, -0.18, 0.18, 0.1, 0.18},
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -413,9 +412,9 @@ minetest.register_node("beer_test:tankard_beer", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.125, -0.5, -0.125, 0.125, 0.25, 0.125},
 			{-0.135, -0.5, -0.135, 0.135, 0.25, 0.135},
-			
+
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -458,9 +457,9 @@ minetest.register_node("beer_test:tankard_dark_beer", {
 			{-0.15, -0.25, 0.04, -0.35 , -0.2, -0.05},
 			{-0.125, -0.5, -0.125, 0.125, 0.25, 0.125},
 			{-0.135, -0.5, -0.135, 0.135, 0.25, 0.135},
-			
+
 			-- side , top , side , side , bottom, side,
-				
+
 		},
 	},
 	selection_box = {
@@ -477,8 +476,3 @@ minetest.register_node("beer_test:tankard_dark_beer", {
 		},
 	},
 })
-
-
-
-print("Beer_test: brewing_beer.lua             [ok]")
- 

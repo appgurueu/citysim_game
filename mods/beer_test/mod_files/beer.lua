@@ -7,12 +7,12 @@
 minetest.register_craftitem("beer_test:yeast", {
 	description = "Yeast",
 	inventory_image = "beer_test_yeast.png",
-}) 
+})
 
 minetest.register_craftitem("beer_test:oat_grain", {
 	description = "Oat Grain",
 	inventory_image = "beer_test_oat_grain.png",
-}) 
+})
 
  --[[  -- keep this --
 minetest.register_craftitem("beer_test:barley", {
@@ -65,7 +65,7 @@ minetest.register_node("beer_test:tray", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Wheat)")
@@ -97,7 +97,7 @@ minetest.register_node("beer_test:wheat_tray", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Wheat)")
@@ -130,7 +130,7 @@ minetest.register_node("beer_test:sprouting_tray", {
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	drop = "beer_test:sprouting_tray_2",
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Wheat sprouted)")
@@ -162,7 +162,7 @@ minetest.register_node("beer_test:sprouting_tray_2", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Wheat sprouted)")
@@ -194,7 +194,7 @@ minetest.register_node("beer_test:malt_tray_malt", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Malt)")
@@ -226,7 +226,7 @@ minetest.register_node("beer_test:malt_tray_crystalised_malt", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Crystalised Malt)")
@@ -258,7 +258,7 @@ minetest.register_node("beer_test:malt_tray_black_malt", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
-	
+
 	on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Malt Tray (Black Malt)")
@@ -346,11 +346,3 @@ minetest.register_abm({
 		end
 	end,
 })
-
-
-
-
-print("Beer_test: beer.lua                     [ok]")
-
-
-
