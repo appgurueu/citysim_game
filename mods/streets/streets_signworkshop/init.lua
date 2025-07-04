@@ -260,7 +260,7 @@ minetest.register_node(":streets:sign_workshop", {
 		"default_wood.png^default_sign_steel.png", "default_wood.png",
 	},
 	drawtype = "nodebox",
-	use_texture_alpha = true,
+	use_texture_alpha = "clip",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = { cracky = 1 },

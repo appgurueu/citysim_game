@@ -42,7 +42,7 @@ function gas_lib.tick(itemstring, pos, elapsed)
 			minetest.swap_node(pos, node)
 		end
 	end
-	
+
 	local rand = math.random(10)
 	local weight = def.weight
 	if weight == 0 then --if has no weight, have a small chance to either go up or down
@@ -81,7 +81,7 @@ local defaultdef =  {
 	paramtype = "light",
 	paramtype2 = "none",
 	drop="",
-	use_texture_alpha=true,
+	use_texture_alpha = "blend",
 	sunlight_propagates = true,
 	walkable = false,
 	pointable = false,

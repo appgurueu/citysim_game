@@ -58,7 +58,7 @@ minetest.register_node("default_tweaks:tunnel_filler", {
 	drawtype = "airlike",
 	--drawtype = "glasslike",
 	--tiles = {"default_glass.png"},
-	--use_texture_alpha = true,
+	--use_texture_alpha = "clip",
 	sunlight_propagates = true,
 	paramtype = "light",
 	walkable = false,
