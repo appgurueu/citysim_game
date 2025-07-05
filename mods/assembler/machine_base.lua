@@ -42,7 +42,7 @@ function assembler.register_base_machine(data)
 	end
 	local active_groups = {not_in_creative_inventory = 1}
 	for k, v in pairs(groups) do active_groups[k] = v end
-	
+
 	local formspec =
 		"size[8,"..tostring(5+data.size)..";]"..
 		"list[current_name;src;.5,.5;"..data.size..","..data.size..";]"..
@@ -147,7 +147,7 @@ function assembler.register_base_machine(data)
 	minetest.register_node("assembler:"..ltier.."_"..machine_name, {
 		description = machine_desc:format(tier),
 		tiles = {
-			"technic_"..ltier.."_"..machine_name.."_top.png"..tentry, 
+			"technic_"..ltier.."_"..machine_name.."_top.png"..tentry,
 			"technic_"..machine_name.."_bottom.png"..tentry,
 			"technic_"..machine_name.."_side.png"..tentry,
 			"technic_"..machine_name.."_side.png"..tentry,
@@ -224,7 +224,7 @@ function assembler.register_base_machine(data)
 			"technic_"..machine_name.."_side.png"..tentry,
 			"technic_"..machine_name.."_side.png"..tentry,
 			{
-				image = "technic_"..machine_name.."_front_active.png",
+				name = "technic_"..machine_name.."_front_active.png",
 				backface_culling = false,
 				animation = {
 					type = "vertical_frames",
