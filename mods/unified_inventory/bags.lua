@@ -118,16 +118,16 @@ local function save_bags_metadata(player, bags_inv)
 		end
 	end
 	if is_empty then
-		player:set_attribute("unified_inventory:bags", nil)
+		player:get_meta():set_string("unified_inventory:bags", "")
 	else
-		player:set_attribute("unified_inventory:bags",
+		player:get_meta():set_string("unified_inventory:bags",
 			minetest.serialize(bags))
 	end
 end
 
 local function load_bags_metadata(player, bags_inv)
 	local player_inv = player:get_inventory()
-	local bags_meta = player:get_attribute("unified_inventory:bags")
+	local bags_meta = player:get_meta():get("unified_inventory:bags")
 	local bags = bags_meta and minetest.deserialize(bags_meta) or {}
 	local dirty_meta = false
 	if not bags_meta then

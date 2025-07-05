@@ -500,7 +500,7 @@ armor.load_armor_inventory = function(self, player)
 	if not name then
 		return
 	end
-	local armor_list_string = player:get_attribute("3d_armor_inventory")
+	local armor_list_string = player:get_meta():get("3d_armor_inventory")
 	if armor_list_string then
 		inv:set_list("armor",
 			self:deserialize_inventory_list(armor_list_string))
@@ -529,7 +529,7 @@ armor.save_armor_inventory = function(self, player)
 			end
 		end
 	end
-	player:set_attribute("3d_armor_inventory",
+	player:get_meta():set_string("3d_armor_inventory",
 		self:serialize_inventory_list(inv:get_list("armor")))
 end
 
