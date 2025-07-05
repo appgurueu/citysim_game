@@ -67,7 +67,7 @@ local wolf = {
 		if mobs:feed_tame(self, clicker, 4, false, true) then
 			local dog, ent
 			local yaw = self.object:get_yaw()
-			dog = minetest.add_entity(self.object:getpos(), "mobs_farm:dog")
+			dog = minetest.add_entity(self.object:get_pos(), "mobs_farm:dog")
 			dog:set_yaw(yaw)
 			ent = dog:get_luaentity()
 			ent.owner = clicker:get_player_name()

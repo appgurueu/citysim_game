@@ -59,9 +59,9 @@ minetest.register_node("thirsty:fountain", {
 	paramtype2 = "facedir",
 	is_ground_content = false,
 	groups = {oddly_breakable_by_hand = 1, waterworks_connected = 1},
-	
+
 	paramtype = "light",
-	
+
 	sounds = default.node_sound_metal_defaults(),
 	_waterworks_update_connected = place_outlet,
 	on_construct = function(pos)
@@ -116,7 +116,7 @@ minetest.register_abm({
 		--minetest.add_node(pos, {name = "default:water_source"})
 	end,
 })
-	
+
 for name, capacity in pairs(thirsty.config.container_capacity) do
 	if not minetest.registered_items[name] then goto next end
 	local def = table.copy(minetest.registered_items[name])
@@ -126,7 +126,7 @@ for name, capacity in pairs(thirsty.config.container_capacity) do
 	def.on_use = function(itemstack, user, pointed_thing)
 		--todo reclick prevention
 		itemstack:replace(name.." 1 65534")
-		minetest.sound_play({name = "drink", gain = 1}, {pos=user:getpos(), max_hear_distance = 16, object=user})
+		minetest.sound_play({name = "drink", gain = 1}, {pos=user:get_pos(), max_hear_distance = 16, object=user})
 		return itemstack
 	end
 	minetest.register_tool(name.."_dirty", def)

@@ -257,7 +257,7 @@ minetest.register_chatcommand("/pos1", {
 	description = "Set WorldEdit region position 1 to the player's location",
 	privs = {worldedit=true},
 	func = function(name, param)
-		local pos = minetest.get_player_by_name(name):getpos()
+		local pos = minetest.get_player_by_name(name):get_pos()
 		pos.x, pos.y, pos.z = math.floor(pos.x + 0.5), math.floor(pos.y + 0.5), math.floor(pos.z + 0.5)
 		worldedit.pos1[name] = pos
 		worldedit.mark_pos1(name)
@@ -270,7 +270,7 @@ minetest.register_chatcommand("/pos2", {
 	description = "Set WorldEdit region position 2 to the player's location",
 	privs = {worldedit=true},
 	func = function(name, param)
-		local pos = minetest.get_player_by_name(name):getpos()
+		local pos = minetest.get_player_by_name(name):get_pos()
 		pos.x, pos.y, pos.z = math.floor(pos.x + 0.5), math.floor(pos.y + 0.5), math.floor(pos.z + 0.5)
 		worldedit.pos2[name] = pos
 		worldedit.mark_pos2(name)
@@ -689,7 +689,7 @@ local check_pyramid = function(name, param)
 	height = tonumber(height)
 	return math.ceil(((height * 2 + 1) ^ 2) * height / 3)
 end
-     
+
 minetest.register_chatcommand("/hollowpyramid", {
 	params = "x/y/z/? <height> <node>",
 	description = "Add hollow pyramid centered at WorldEdit position 1 along the x/y/z/? axis with height <height>, composed of <node>",

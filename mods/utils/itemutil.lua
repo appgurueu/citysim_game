@@ -29,10 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 itemutil = {
 	--- The split mode for randomly splitting the stack.
 	SPLIT_MODE_RANDOM = "random",
-	
+
 	--- The split mode for splitting the stack into single items.
 	SPLIT_MODE_SINGLE = "single",
-	
+
 	--- The split mode for preserving the complete stack.
 	SPLIT_MODE_STACK = "stack"
 }
@@ -57,14 +57,14 @@ function itemutil.blop(position_or_object, itemstrings_or_stacks, x_strength, y_
 	y_strength = math.max(y_strength or 5, 1)
 	z_strength = z_strength or 5
 	split_mode = split_mode or itemutil.SPLIT_MODE_STACK
-	
+
 	local position = position_or_object
 	if type(position.getpos) == "function" then
-		position = position:getpos()
+		position = position:get_pos()
 	end
-	
+
 	local itemstrings = List:new()
-	
+
 	if type(itemstrings_or_stacks) == "table" then
 		for index, itemstring_or_stack in ipairs(itemstrings_or_stacks) do
 			itemstrings:add_list(itemutil.split(itemstring_or_stack, split_mode))
@@ -72,23 +72,23 @@ function itemutil.blop(position_or_object, itemstrings_or_stacks, x_strength, y_
 	else
 		itemstrings:add_list(itemutil.split(itemstrings_or_stacks, split_mode))
 	end
-	
+
 	local spawned_items = List:new()
-	
+
 	itemstrings:foreach(function(itemstring, index)
 		local spawned_item = minetest.add_item(position, itemstring)
-		
+
 		if spawned_item ~= nil then
 			spawned_item:setvelocity({
 				x = random.next_float(-x_strength, x_strength),
 				y = random.next_float(1, y_strength),
 				z = random.next_float(-z_strength, z_strength)
 			})
-			
+
 			spawned_items:add(spawned_item)
 		end
 	end)
-	
+
 	return spawned_items
 end
 
@@ -104,7 +104,7 @@ function itemutil.get_itemstring(item)
 			return item:to_string()
 		end
 	end
-	
+
 	return nil
 end
 
@@ -121,7 +121,7 @@ function itemutil.split(itemstring_or_itemstack, split_mode)
 	elseif split_mode == itemutil.SPLIT_MODE_STACK then
 		return List:new(itemutil.get_itemstring(itemstring_or_itemstack))
 	end
-	
+
 	return List:new()
 end
 
@@ -132,21 +132,21 @@ end
 -- @return The List of item strings.
 function itemutil.split_random(itemstring_or_itemstack)
 	local stack = ItemStack(itemstring_or_itemstack)
-	
+
 	local itemstrings = List:new()
-	
+
 	local name = stack:get_name()
 	local remaining = stack:get_count()
-	
+
 	while remaining > 0 do
 		local count = random.next_int(1, remaining)
 		local itemstring = name .. " " .. tostring(count)
-		
+
 		itemstrings:add(itemstring)
-		
+
 		remaining = remaining - count;
 	end
-	
+
 	return itemstrings
 end
 
@@ -157,15 +157,15 @@ end
 -- @return The List of item strings.
 function itemutil.split_single(itemstring_or_itemstack)
 	local stack = ItemStack(itemstring_or_itemstack)
-	
+
 	local itemstrings = List:new()
-	
+
 	local name = stack:get_name()
-	
+
 	for counter = 1, stack:get_count(), 1 do
 		itemstrings:add(name)
 	end
-	
+
 	return itemstrings
 end
 

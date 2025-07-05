@@ -23,7 +23,7 @@ local function reg_ball(color)
 				self.object:setacceleration({x=0, y=-10, z=0})
 				self.timer = 0
 				local vel = self.object:getvelocity()
-				local p = self.object:getpos();
+				local p = self.object:get_pos();
 				p.y = p.y - 0.5
 				if minetest.registered_nodes[minetest.env:get_node(p).name].walkable then
 					vel.x = vel.x * 0.85
@@ -36,7 +36,7 @@ local function reg_ball(color)
 					vel.z = 0
 				end
 				self.object:setvelocity(vel)
-				local pos = self.object:getpos()
+				local pos = self.object:get_pos()
 				local objs = minetest.env:get_objects_inside_radius(pos, 1)
 				local player_count = 0
 				local final_dir = { x=0, y=0, z=0 }

@@ -31,81 +31,81 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 voice = {
 	--- Type constant for a global message.
 	TYPE_GLOBAL = "global",
-	
+
 	--- Type constant for a shouted message.
 	TYPE_SHOUT = "shout",
-	
+
 	--- Type constant for a talked message.
 	TYPE_TALK = "talk",
-	
+
 	--- Type constant for a whispered message.
 	TYPE_WHISPER = "whisper",
-	
+
 	--- If the system should be activated automatically.
 	activate_automatically = settings.get_bool("voice_activate", true),
-	
+
 	--- If the system is active/has been activated.
 	active = false,
-	
+
 	--- The privilege that is needed for using the global command.
 	global_privilege = settings.get_string("voice_global_privilege", "voice_global"),
-	
+
 	--- The line of sight modification, which means that if the target does not
 	-- have line of sight with the source, this mod will be applied to
 	-- the range to limit it.
 	line_of_sight_mod = settings.get_number("voice_line_of_sight_mod", 0.40),
-	
+
 	--- The callbacks for when a message is send.
 	message_callbacks = List:new(),
-	
+
 	--- The parameters for talking.
-	
+
 	--- The parameters for shouting.
 	shout_parameters = {
 		--- Everything within this range (inclusive) will be understandable.
 		understandable = settings.get_number("voice_shout_understandable", 45),
-		
+
 		--- Everything within this range (inclusive) will be abstruse, which
 		-- means that only part of the message (depending on the distance) will
 		-- be understandable.
 		abstruse = settings.get_number("voice_shout_abstruse", 60),
-		
+
 		--- Everything within this range (inclusive) will not be understandable.
 		incomprehensible = settings.get_number("voice_shout_incomprehensible", 80),
-		
+
 		-- The type of these parameters.
 		type = "shout"
 	},
-	
+
 	talk_parameters = {
 		--- Everything within this range (inclusive) will be understandable.
 		understandable = settings.get_number("voice_talk_understandable", 6),
-		
+
 		--- Everything within this range (inclusive) will be abstruse, which
 		-- means that only part of the message (depending on the distance) will
 		-- be understandable.
 		abstruse = settings.get_number("voice_talk_abstruse", 12),
-		
+
 		--- Everything within this range (inclusive) will not be understandable.
 		incomprehensible = settings.get_number("voice_talk_incomprehenisble", 17),
-		
+
 		-- The type of these parameters.
 		type = "talk"
 	},
-	
+
 	--- The parameters for whispering.
 	whisper_parameters = {
 		--- Everything within this range (inclusive) will be understandable.
 		understandable = settings.get_number("voice_whisper_understandable", 3),
-		
+
 		--- Everything within this range (inclusive) will be abstruse, which
 		-- means that only part of the message (depending on the distance) will
 		-- be understandable.
 		abstruse = settings.get_number("voice_whisper_abstruse", 4),
-		
+
 		--- Everything within this range (inclusive) will not be understandable.
 		incomprehensible = settings.get_number("voice_whisper_incomprehensible", 5),
-		
+
 		-- The type of these parameters.
 		type = "whisper"
 	}
@@ -121,10 +121,10 @@ voice = {
 -- @return The abstrused message.
 function voice.abstruse(message, rate)
 	local abstruse_message = ""
-	
+
 	for index = 1, string.len(message), 1 do
 		local piece = string.sub(message, index, index)
-		
+
 		-- Only abstruse words, leave dots, quotes etc. in place.
 		if string.find(piece, "%w") ~= nil then
 			if voice.random(rate) then
@@ -136,7 +136,7 @@ function voice.abstruse(message, rate)
 			abstruse_message = abstruse_message .. piece
 		end
 	end
-	
+
 	return abstruse_message
 end
 
@@ -154,14 +154,14 @@ function voice.activate_internal()
 			description = "The privilege needed to use the global chat.",
 			give_to_singleplayer = true
 		})
-		
+
 		--minetest.register_on_chat_message(voice.on_chat_message)
-		
+
 		voice.register_chatcommand("t", "talk", "Talk", voice.talk_parameters)
 		voice.register_chatcommand("s", "shout", "Shout", voice.shout_parameters)
 		voice.register_chatcommand("w", "whisper", "Whisper", voice.whisper_parameters)
 		voice.register_global_chatcommand()
-		
+
 		voice.active = true
 	end
 end
@@ -193,13 +193,13 @@ function voice.invoke_message_callbacks(player, type, message)
 	voice.message_callbacks:foreach(function(callback, index)
 		local modified_suppress = nil
 		local modified_message = nil
-		
+
 		modified_suppress, modified_message = callback(
 			player,
 			type,
 			suppress,
 			message)
-		
+
 		if modified_suppress ~= nil then
 			suppress = modified_suppress
 		end
@@ -207,7 +207,7 @@ function voice.invoke_message_callbacks(player, type, message)
 			message = modified_message
 		end
 	end)
-	
+
 	return suppress, message
 end
 
@@ -227,9 +227,9 @@ end
 -- @return true if the message has been handled and should not be send.
 function voice.on_chat_message(name, message)
 	local player = minetest.get_player_by_name(name)
-	
+
 	voice.speak(player, message, voice.talk_parameters)
-	
+
 	-- Do not send the message further, we've done that.
 	return true
 end
@@ -255,13 +255,13 @@ function voice.register_chatcommand(short, long, description, parameters)
 		func = function(player_name, message)
 			if not minetest.get_player_by_name(player_name) then return false, "You are not ingame" end
 			local player = minetest.get_player_by_name(player_name)
-			
+
 			voice.speak(player, message, parameters)
-			
+
 			return true
 		end
 	}
-	
+
 	minetest.register_chatcommand(short, command)
 	minetest.register_chatcommand(long, command)
 end
@@ -272,7 +272,7 @@ function voice.register_global_chatcommand()
 		description = "Allows the player to send global messages.",
 		give_to_singleplayer = true
 	})
-	
+
 	local command = {
 		description = "Global",
 		params = "<message>",
@@ -282,19 +282,19 @@ function voice.register_global_chatcommand()
 				minetest.get_player_by_name(player_name),
 				voice.TYPE_GLOBAL,
 				message)
-			
+
 			if suppress then
 				return true
 			end
-			
+
 			minetest.chat_send_all("<" .. player_name .. ">(Global): " .. message)
                         minetest.log("CHAT: <" .. player_name .. ">(Global): " .. message)
                         irc:say("<" .. player_name .. ">(Global): " .. message)
-			
+
 			return true
 		end
 	}
-	
+
 	minetest.register_chatcommand("g", command)
 	minetest.register_chatcommand("global", command)
 end
@@ -323,22 +323,22 @@ function voice.speak(speaking_player, message, parameters)
 		speaking_player,
 		parameters.type,
 		message)
-	
+
 	if suppress then
 		return
 	end
-	
+
 	local source_name = speaking_player:get_player_name()
-	local source_pos = speaking_player:getpos()
+	local source_pos = speaking_player:get_pos()
         local short = string.sub(parameters.type, 1, 1)
-	
+
 	for index, player in ipairs(minetest.get_connected_players()) do
 		local target_name = player:get_player_name()
-		
+
 		if source_name ~= target_name then
-			local target_pos = player:getpos()
+			local target_pos = player:get_pos()
 			local distance = mathutil.distance(source_pos, target_pos)
-			
+
 			-- Test now if we're even in range, minor optimization.
 			if distance <= parameters.incomprehensible then
 				-- TODO The y+1 thing is to emulate players height, might be wrong.
@@ -353,14 +353,14 @@ function voice.speak(speaking_player, message, parameters)
 				})
 				local short_type = string.sub(parameters.type, 1, 1)
                                 short = short_type
-				
+
 				if voice.in_range(distance, parameters.understandable, line_of_sight) then
 					minetest.chat_send_player(
 						target_name,
 						"<" .. source_name .. "> (" .. short_type .. ") " .. message)
 				elseif voice.in_range(distance, parameters.abstruse, line_of_sight) then
 					local rate = transform.linear(distance, parameters.understandable, parameters.abstruse)
-					
+
 					-- Here we have a random chance that the player name is muffeld.
 					if voice.random(rate) then
 						minetest.chat_send_player(

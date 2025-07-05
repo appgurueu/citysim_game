@@ -22,9 +22,9 @@ end
 local function finishfrisk(player, pName, oldpos)
 	local pPlayer = minetest.get_player_by_name(pName)
 	local name = player:get_player_name()
-	local pos = pPlayer and pPlayer:getpos()
+	local pos = pPlayer and pPlayer:get_pos()
 	if pPlayer and pPlayer:get_attach() then
-		pos = pPlayer:get_attach():getpos()
+		pos = pPlayer:get_attach():get_pos()
 	end
 	if not pPlayer or vector.distance(pos, oldpos) > .5 then
 		if pPlayer then
@@ -82,9 +82,9 @@ local function startfrisk(stack, player, pointedThing)
 			local name = player:get_player_name()
 			minetest.chat_send_player(pName, name.." is frisking you, move to cancel.")
 			minetest.chat_send_player(name, "You are frisking "..pName..".")
-			local oldpos = obj:getpos()
+			local oldpos = obj:get_pos()
 			if obj:get_attach() then
-				oldpos = obj:get_attach():getpos()
+				oldpos = obj:get_attach():get_pos()
 			end
 			minetest.after(8, finishfrisk, player, pName, oldpos)
 		end
@@ -128,9 +128,9 @@ end)
 local function finishcuff(player, pName, oldpos)
 	local pPlayer = minetest.get_player_by_name(pName)
 	local name = player:get_player_name()
-	local pos = pPlayer and pPlayer:getpos()
+	local pos = pPlayer and pPlayer:get_pos()
 	if pPlayer and pPlayer:get_attach() then
-		pos = pPlayer:get_attach():getpos()
+		pos = pPlayer:get_attach():get_pos()
 	end
 	if not pPlayer or vector.distance(pos, oldpos) > .5 then
 		if pPlayer then
@@ -153,7 +153,7 @@ local function finishcuff(player, pName, oldpos)
 		cuffedplayers[pName] = true
 	else
 		local privs = minetest.get_player_privs(pName)
-		
+
 		--[[if privs.shout then
 			hasshout[pName] = true
 		else
@@ -161,7 +161,7 @@ local function finishcuff(player, pName, oldpos)
 		end
 		privs.shout = nil
 		modstorage:set_string("hasshout", minetest.serialize(hasshout))--]]
-		
+
 		if privs.interact then
 			cuffedplayers[pName] = true
 		else
@@ -192,13 +192,13 @@ local function startcuff(stack, player, pointedThing)
 					local name = player:get_player_name()
 					minetest.chat_send_player(pName, name.." is cuffing you, move to cancel.")
 					minetest.chat_send_player(name, "You are cuffing "..pName..".")
-					local oldpos = obj:getpos()
+					local oldpos = obj:get_pos()
 					if obj:get_attach() then
-						oldpos = obj:get_attach():getpos()
+						oldpos = obj:get_attach():get_pos()
 					end
 					minetest.after(6, finishcuff, player, pName, oldpos)
 					minetest.sound_play("cuff", {
-						pos = obj:getpos(),
+						pos = obj:get_pos(),
 						max_hear_distance = 10,
 						gain = 1.0,
 						object = obj
@@ -231,7 +231,7 @@ local function uncuff(stack, player, pointedThing)
 					else
 						privs.interact = nil
 					end
-					
+
 					--[[if hasshout[pName] == true then
 						privs.shout = true
 					else
@@ -239,7 +239,7 @@ local function uncuff(stack, player, pointedThing)
 					end
 					hasshout[pName] = nil
 					modstorage:set_string("hasshout", minetest.serialize(hasshout))--]]
-					
+
 					minetest.set_player_privs(pName, privs)
 				end
 				obj:hud_set_flags({wielditem=true})
@@ -253,12 +253,12 @@ local function uncuff(stack, player, pointedThing)
 					wearcalc = 0
 				end
 				minetest.sound_play("uncuff", {
-					pos = obj:getpos(),
+					pos = obj:get_pos(),
 					max_hear_distance = 10,
 					gain = 1.0,
 					object = obj
 				})
-				minetest.add_item(obj:getpos(), player_inv:add_item("main", {name="frisk:handcuffs", count=1, wear=wearcalc, metadata=""}))
+				minetest.add_item(obj:get_pos(), player_inv:add_item("main", {name="frisk:handcuffs", count=1, wear=wearcalc, metadata=""}))
 				cuffdamage[pName] = nil
 				modstorage:set_string("cuffdamage", minetest.serialize(cuffdamage))
 			end
@@ -317,7 +317,7 @@ minetest.register_globalstep(function(dtime)
 					cuffdamage[name] = cuffdamage[name] + math.random(1,3)
 					if math.random(1,5) == 1 then
 						minetest.sound_play("wriggle", {
-							pos = player:getpos(),
+							pos = player:get_pos(),
 							max_hear_distance = 10,
 							gain = 1.0,
 							object = player
@@ -345,7 +345,7 @@ minetest.register_globalstep(function(dtime)
 						cuffdamage[name] = nil
 						player:hud_set_flags({wielditem=true})
 						minetest.sound_play("uncuff", {
-							pos = player:getpos(),
+							pos = player:get_pos(),
 							max_hear_distance = 10,
 							gain = 1.0,
 							object = player
@@ -380,7 +380,7 @@ minetest.register_on_dieplayer(function(player)
 		end
 		hasshout[pName] = nil
 		modstorage:set_string("hasshout", minetest.serialize(hasshout))
-		
+
 		minetest.set_player_privs(pName, privs)
 		player:hud_set_flags({wielditem=true})
 		cuffedplayers[pName] = nil
@@ -392,7 +392,7 @@ minetest.register_on_dieplayer(function(player)
 		else
 			wearcalc = 0
 		end
-		minetest.add_item(player:getpos(), {name="frisk:handcuffs", count=1, wear=wearcalc, metadata=""})
+		minetest.add_item(player:get_pos(), {name="frisk:handcuffs", count=1, wear=wearcalc, metadata=""})
 		cuffdamage[pName] = nil
 		modstorage:set_string("cuffdamage", minetest.serialize(cuffdamage))
 	end
@@ -415,7 +415,7 @@ end
 
 local function add_metal_group(itemname)
 	local groups = {}
-	if not minetest.registered_items[itemname] then return end 
+	if not minetest.registered_items[itemname] then return end
 	if minetest.registered_items[itemname].groups then groups = table.copy(minetest.registered_items[itemname].groups) end
 	groups.detectable_metal = 1
 	minetest.override_item(itemname, {
@@ -546,9 +546,9 @@ end
 local function finishmetaldetect(player, pName, oldpos)
 	local pPlayer = minetest.get_player_by_name(pName)
 	local name = player:get_player_name()
-	local pos = pPlayer:getpos()
+	local pos = pPlayer:get_pos()
 	if pPlayer:get_attach() then
-		pos = pPlayer:get_attach():getpos()
+		pos = pPlayer:get_attach():get_pos()
 	end
 	if vector.distance(pos, oldpos) > .1 then
 		minetest.chat_send_player(pName, "You moved, metal detection canceled.")
@@ -577,9 +577,9 @@ local function startmetaldetect(stack, player, pointedThing)
 		if pName ~= "" then
 			minetest.chat_send_player(pName, name.." is checking you for metal, move to cancel.")
 			minetest.chat_send_player(name, "You are checking "..pName.." for metal.")
-			local oldpos = obj:getpos()
+			local oldpos = obj:get_pos()
 			if obj:get_attach() then
-				oldpos = obj:get_attach():getpos()
+				oldpos = obj:get_attach():get_pos()
 			end
 			minetest.after(1, finishmetaldetect, player, pName, oldpos)
 		end

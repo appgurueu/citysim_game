@@ -111,7 +111,7 @@ local function update_punches()
 		local pos = data.pos
 		local player = minetest.get_player_by_name(name)
 		if data.dist then
-			if player and vector.distance(pos, player:getpos()) > data.dist then
+			if player and vector.distance(pos, player:get_pos()) > data.dist then
 				jobs.punch(name, pos)
 				return
 			end
@@ -174,7 +174,7 @@ minetest.register_node("jobs:clock", {
 		type = "fixed",
 		fixed = { -5/16, -6/16, 5/16, 5/16, 2/16, 7/16 }
 	},
-	digiline = 
+	digiline =
 	{
 		receptor={},
 	},
@@ -190,7 +190,7 @@ minetest.register_node("jobs:clock", {
 			meta:set_string("formspec", setup_form)
 		end
 		if not jobs.players[name] or not jobs.players[name][jobname] then return end
-		
+
 		context[name] = pos
 		local punchedin = false
 		if jobs.punches[name] and jobs.punches[name].jobname and jobs.punches[name].jobname == jobname then punchedin = true end

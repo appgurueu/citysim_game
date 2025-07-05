@@ -29,37 +29,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 mathutil = {
 	--- The maximum value a signed 8bit integer can have.
 	SIGNED_8BIT_MAX = 2^7 - 1,
-	
+
 	--- The minimum value a signed 8bit integer can have.
 	SIGNED_8BIT_MIN = -2^7,
-	
+
 	--- The maximum value a signed 16bit integer can have.
 	SIGNED_16BIT_MAX = 2^15 - 1,
-	
+
 	--- The minimum value a signed 16bit integer can have.
 	SIGNED_16BIT_MIN = -2^15,
-	
+
 	--- The maximum value a signed 32bit integer can have.
 	SIGNED_32BIT_MAX = 2^31 - 1,
-	
+
 	--- The minimum value a signed 32bit integer can have.
 	SIGNED_32BIT_MIN = -2^31,
-	
+
 	--- The maximum value an unsigned 8bit integer can have.
 	UNSIGNED_8BIT_MAX = 2^8 - 1,
-	
+
 	--- The minimum value an unsigned 8bit integer can have.
 	UNSIGNED_8BIT_MIN = 0,
-	
+
 	--- The maximum value an unsigned 16bit integer can have.
 	UNSIGNED_16BIT_MAX = 2^16 - 1,
-	
+
 	--- The minimum value an unsigned 16bit integer can have.
 	UNSIGNED_16BIT_MIN = 0,
-	
+
 	--- The maximum value an unsigned 32bit integer can have.
 	UNSIGNED_32BIT_MAX = 2^32 - 1,
-	
+
 	--- The minimum value an unsigned 32bit integer can have.
 	UNSIGNED_32BIT_MIN = 0
 }
@@ -97,22 +97,22 @@ end
 -- @return The distance between the two given points or objects.
 function mathutil.distance(a, b)
 	if type(a.getpos) == "function" then
-		a = a:getpos()
+		a = a:get_pos()
 	end
-	
+
 	if type(b.getpos) == "function" then
-		b = b:getpos()
+		b = b:get_pos()
 	end
-	
+
 	local distance_point = {
 		x = math.abs(a.x - b.x),
 		y = math.abs(a.y - b.y),
 		z = math.abs(a.z - b.z)
 	}
-	
+
 	local distance2d = math.sqrt(math.pow(distance_point.x, 2) + math.pow(distance_point.z, 2))
 	local distance3d = math.sqrt(math.pow(distance2d, 2) + math.pow(distance_point.y, 2))
-	
+
 	return distance3d
 end
 
@@ -138,18 +138,18 @@ end
 --         the x/z plane.
 function mathutil.distance2d(a, b)
 	if type(a.getpos) == "function" then
-		a = a:getpos()
+		a = a:get_pos()
 	end
-	
+
 	if type(b.getpos) == "function" then
-		b = b:getpos()
+		b = b:get_pos()
 	end
-	
+
 	local distance_point = {
 		x = math.abs(a.x - b.x),
 		z = math.abs(a.z - b.z)
 	}
-	
+
 	return math.sqrt(math.pow(distance_point.x, 2) + math.pow(distance_point.z, 2))
 end
 
@@ -170,13 +170,13 @@ function mathutil.in_range(value, min, max)
 			min = min.min
 		end
 	end
-	
+
 	if min > max then
 		local temp = min
 		min = max
 		max = temp
 	end
-	
+
 	return value >= min and value <= max
 end
 
@@ -218,11 +218,11 @@ function mathutil.next_lower_prime(number)
 			and (lower <= 3 or math.fmod(lower, 3) ~= 0)
 			and (lower <= 5 or math.fmod(lower, 5) ~= 0)
 			and (lower <= 7 or math.fmod(lower, 7) ~= 0) then
-			
+
 			return lower
 		end
 	end
-	
+
 	return 0
 end
 
@@ -234,7 +234,7 @@ end
 -- @return The rounded value.
 function mathutil.round(value, decimal_places)
 	decimal_places = decimal_places or 0
-	
+
 	local multiplicator = 10 ^ decimal_places
 	return math.floor(value * multiplicator + 0.5) / multiplicator
 end

@@ -17,7 +17,7 @@ for i, size in ipairs(sizes) do
 	local description
 	local drop
 	local tiles
-	
+
 	if slice == 0 then
 		name = "cake:cake"
 		description = S("Cake")
@@ -28,7 +28,7 @@ for i, size in ipairs(sizes) do
 		drop = ''
 		tiles = {"cake_top.png", "cake_bottom.png", "cake_side.png", "cake_inner.png", "cake_side.png", "cake_side.png"}
 	end
-	
+
 	minetest.register_node(name, {
 		description = description,
 		drop = drop,
@@ -75,7 +75,7 @@ if not minetest.get_modpath("food") then
 		inventory_image = "cake_sugar.png",
 		groups = {food_sugar=1}
 	})
-	
+
 	minetest.register_craft({
 		type = "shapeless",
 		output = "cake:sugar",
@@ -91,7 +91,7 @@ minetest.register_craft({
 	recipe = {"farming:flour", "group:water_bucket", "group:food_sugar", "group:food_sugar"},
 	replacements = {
 		{"group:water_bucket", "bucket:bucket_empty"},
-		
+
 		-- Not needed >0.4.13
 		{"bucket:bucket_water", "bucket:bucket_empty"},
 		{"bucket:bucket_river_water", "bucket:bucket_empty"}
@@ -114,7 +114,7 @@ minetest.register_entity("cake:cake_entity", {
 	collisionbox = {0,0,0,0,0,0},
 	on_step = function(self, dtime)
 		self.timer=self.timer+dtime
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		local node = minetest.get_node(pos)
 
 		if self.timer>0.2 then
@@ -143,7 +143,7 @@ if throwable_cake then
 			if not minetest.settings:get_bool("creative_mode") then
 				itemstack:take_item()
 			end
-			local playerpos = player:getpos()
+			local playerpos = player:get_pos()
 			local obj = minetest.add_entity({x=playerpos.x,y=playerpos.y+1.5,z=playerpos.z}, "cake:cake_entity")
 			local dir = player:get_look_dir()
 			obj:setvelocity({x=dir.x*19, y=dir.y*19, z=dir.z*19})

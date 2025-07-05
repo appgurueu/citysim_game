@@ -388,7 +388,7 @@ minetest.register_entity("technic:frame_entity", {
 
 	set_node = function(self, node)
 		self.node = node
-		local pos = vector.round(self.object:getpos())
+		local pos = vector.round(self.object:get_pos())
 		frames_pos[pos_to_string(pos)] = node.name
 
 -- This code does nothing currently, so it is disabled to stop luacheck warnings

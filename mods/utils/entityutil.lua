@@ -38,7 +38,7 @@ entityutil = {
 -- @return true if the given entity is a builtin item.
 function entityutil.is_builtin_item(entity)
 	local lua_entity = entity:get_luaentity();
-	
+
 	return entity.name == entityutil.BUILTIN_ITEM_NAME
 		or (lua_entity ~= nil
 			and lua_entity.name == entityutil.BUILTIN_ITEM_NAME)
@@ -59,14 +59,14 @@ function entityutil.move_to(entity, position, acceleration_x, acceleration_y, ac
 	acceleration_x = acceleration_x or 1
 	acceleration_y = acceleration_y or acceleration_x
 	acceleration_z = acceleration_z or acceleration_x
-	
-	local direction = vector.direction(entity:getpos(), position)
+
+	local direction = vector.direction(entity:get_pos(), position)
 	local velocity = entity:getvelocity()
-	
+
 	velocity.x = velocity.x + (acceleration_x * direction.x)
 	velocity.y = velocity.y + (acceleration_y * direction.y)
 	velocity.z = velocity.z + (acceleration_z * direction.z)
-	
+
 	entity:setvelocity(velocity)
 end
 

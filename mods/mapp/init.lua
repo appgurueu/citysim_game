@@ -6,7 +6,7 @@ minetest.register_tool("mapp:map", {
 	end,
 })
 function map_handler (itemstack, user, pointed_thing)
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local player_name=user:get_player_name()
 		local mapar = {}
 		local map
@@ -23,7 +23,7 @@ function map_handler (itemstack, user, pointed_thing)
            yaw = math.deg(yaw)
            yaw = math.fmod (yaw, 360)
            if yaw<0 then yaw = 360 + yaw end
-           if yaw>360 then yaw = yaw - 360 end           
+           if yaw>360 then yaw = yaw - 360 end
            if yaw < 90 then
               rotate = 90
            elseif yaw < 180 then
@@ -35,7 +35,7 @@ function map_handler (itemstack, user, pointed_thing)
            end
            yaw = math.fmod(yaw, 90)
            yaw = math.floor(yaw / 10) * 10
-           
+
         end
 
 		--Localise some global minetest variables for speed.

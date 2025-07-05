@@ -141,7 +141,7 @@ local function teleport_player_from_elevator(player)
         end
         return minetest.registered_nodes[minetest.get_node(pos).name].walkable
     end
-    local pos = vector.round(player:getpos())
+    local pos = vector.round(player:get_pos())
     local node = minetest.get_node(pos)
     -- elevator_off is like a shaft, so the player would already be falling.
     if node.name == "elevator:elevator_on" then
@@ -176,7 +176,7 @@ minetest.register_globalstep(function(dtime)
     riding = newriding
     for name,r in pairs(riding) do
         -- If the box is no longer loaded or existent, create another.
-        local ok = r.box and r.box.getpos and r.box:getpos() and r.box:get_luaentity() and r.box:get_luaentity().attached == name
+        local ok = r.box and r.box.getpos and r.box:get_pos() and r.box:get_luaentity() and r.box:get_luaentity().attached == name
         if not ok then
             minetest.log("action", "[elevator] "..minetest.pos_to_string(r.pos).." created due to lost rider.")
             minetest.after(0, create_box, r.motor, r.pos, r.target, minetest.get_player_by_name(name))
@@ -189,7 +189,7 @@ minetest.register_globalstep(function(dtime)
         end
         lastboxes[motor] = lastboxes[motor] and math.min(lastboxes[motor], PTIMEOUT) or PTIMEOUT
         lastboxes[motor] = math.max(lastboxes[motor] - 1, 0)
-        local pos = obj:getpos()
+        local pos = obj:get_pos()
         if pos then
             for _,object in ipairs(minetest.get_objects_inside_radius(pos, 5)) do
                 if object.is_player and object:is_player() then
@@ -323,11 +323,11 @@ local function unbuild(pos, add)
         local motorhash = locate_motor(p2)
         build_motor(motorhash)
         -- If there's a box below this point, break it.
-        if boxes[motorhash] and boxes[motorhash]:getpos() and p2.y >= boxes[motorhash]:getpos().y then
+        if boxes[motorhash] and boxes[motorhash]:get_pos() and p2.y >= boxes[motorhash]:get_pos().y then
             boxes[motorhash] = nil
         end
         -- If the box does not exist, just clear it.
-        if boxes[motorhash] and not boxes[motorhash]:getpos() then
+        if boxes[motorhash] and not boxes[motorhash]:get_pos() then
             boxes[motorhash] = nil
         end
     end, table.copy(pos), add)
@@ -474,7 +474,7 @@ for _,mode in ipairs({"on", "off"}) do
             local meta = minetest.get_meta(pos)
             formspecs[sender:get_player_name()] = {pos}
             if on then
-                if vector.distance(sender:getpos(), pos) > 1 or minetest.get_node(sender:getpos()).name ~= nodename then
+                if vector.distance(sender:get_pos(), pos) > 1 or minetest.get_node(sender:get_pos()).name ~= nodename then
                     minetest.chat_send_player(sender:get_player_name(), "You are not inside the booth.")
                     return
                 end
@@ -569,7 +569,7 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
         return true
     end
     -- Double check if it's ok to go.
-    if vector.distance(sender:getpos(), pos) > 1 then
+    if vector.distance(sender:get_pos(), pos) > 1 then
         return true
     end
     if fields.target then
@@ -811,7 +811,7 @@ local box_entity = {
     end,
 
     on_step = function(self, dtime)
-        local pos = self.object:getpos()
+        local pos = self.object:get_pos()
         -- First, check if this box needs removed.
         -- If the motor has a box and it isn't this box.
         if boxes[self.motor] and boxes[self.motor] ~= self.object then

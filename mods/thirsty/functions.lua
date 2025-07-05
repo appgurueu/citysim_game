@@ -20,7 +20,7 @@ function thirsty.on_joinplayer(player)
     local name = player:get_player_name()
     -- default entry for new players
     if not thirsty.players[name] then
-        local pos = player:getpos()
+        local pos = player:get_pos()
         thirsty.players[name] = {
             last_pos = math.floor(pos.x) .. ':' .. math.floor(pos.z),
             time_in_pos = 0.0,
@@ -58,7 +58,7 @@ function thirsty.drink(player, value, max)
         hydro = math.min(hydro + value, max)
         --print("Drinking by "..value.." to "..hydro)
         PPA.set_value(player, 'thirsty_hydro', hydro)
-		minetest.sound_play({name = "drink", gain = 1}, {pos=player:getpos(), max_hear_distance = 16, object=user})
+		minetest.sound_play({name = "drink", gain = 1}, {pos=player:get_pos(), max_hear_distance = 16, object=user})
         return true
     end
     return false
@@ -100,7 +100,7 @@ function thirsty.main_loop(dtime)
             end
 
             local name = player:get_player_name()
-            local pos  = player:getpos()
+            local pos  = player:get_pos()
             local pl = thirsty.players[name]
             local hydro = PPA.get_value(player, 'thirsty_hydro')
 
@@ -311,7 +311,7 @@ function thirsty.drink_handler(player, itemstack, under)
             --print("Filling a " .. item_name .. " to " .. thirsty.config.container_capacity[item_name])
             itemstack:set_wear(1) -- "looks full"
         end
-		
+
 		if math.random(math.floor(drink_per_block/consumed+.5)) == 1 then
 			minetest.remove_node(under)
 		end
@@ -320,7 +320,7 @@ function thirsty.drink_handler(player, itemstack, under)
 		local wear = itemstack:get_wear()
 		if thirsty.config.node_dirty and thirsty.config.node_dirty[node_name] and (wear == 0 or wear >= 65534) then
 			itemstack:replace(item_name.."_dirty 1 1")
-			minetest.sound_play({name = "drink", gain = 1}, {pos=player:getpos(), max_hear_distance = 16, object=player})
+			minetest.sound_play({name = "drink", gain = 1}, {pos=player:get_pos(), max_hear_distance = 16, object=player})
         elseif wear ~= 0 then-- drinking from a container
             local capacity = thirsty.config.container_capacity[item_name]
             local hydro_missing = 20 - hydro;
