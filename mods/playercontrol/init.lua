@@ -33,7 +33,7 @@ local function update()
 	end
 	minetest.after(60, update)
 end
-update()
+minetest.after(0, update)
 
 function get_player_playtime(name)
 	if not minetest.player_exists(name) then return 0 end

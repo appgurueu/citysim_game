@@ -82,7 +82,7 @@ local function spoodtick()
 	storage:set_string("data", minetest.serialize(spoodtbl))
 	minetest.after(60, spoodtick)
 end
-spoodtick()
+core.after(0, spoodtick)
 
 minetest.register_on_dieplayer(function(player, reason)
 	local name = player:get_player_name()

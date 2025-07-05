@@ -73,14 +73,14 @@ end
 local function unload_chunk(chunkpos, write, time)
 	if not chunkpos or not active_chunks[chunkpos] then return end --if no chunk given or is not loaded then return
 	cull_chunk(chunkpos, time)
-	
+
 	if is_table_empty(active_chunks[chunkpos]) then
 		storage:set_string(chunkpos, "")
 		--minetest.chat_send_all("is empty")
 	else
 		storage:set_string(chunkpos, minetest.serialize(active_chunks[chunkpos]))
 	end
-	
+
 	active_chunks[chunkpos] = nil
 	if write ~= false then
 		save_active()
@@ -217,7 +217,7 @@ local function load_tick() --this timed function will handle automatic loading a
 			load_chunk(chunk)
 		end
 	end
-	
+
 	local chunks_to_unload = {} --unload active chunks that are now out of range
 	for chunk, _ in pairs(active_chunks) do
 		if not nearby_chunks[chunk] then
@@ -227,7 +227,7 @@ local function load_tick() --this timed function will handle automatic loading a
 	unload_chunks(chunks_to_unload)
 	minetest.after(load_interval, load_tick)
 end
-load_tick()
+core.after(0, load_tick)
 
 local function track_tick()
 	local update = false
@@ -253,7 +253,7 @@ local function track_tick()
 	end
 	minetest.after(track_interval, track_tick)
 end
-track_tick()
+core.after(0, track_tick)
 
 minetest.register_on_shutdown(function()
 	unload_chunks(active_chunks)
