@@ -74,7 +74,8 @@ Each links to its detailed entry in §2.
 
 **This section is the source of truth for progress.** Tick a box only when the item is
 done *across the whole game*; use `~` for partial and record which mods remain in the
-per-item note. Per-mod state lives in §7.2.
+per-item note. Per-mod state lives in §7.2. **§7.1.2 carries the measured hit count for
+each item** — consult it before estimating any of them.
 
 Convention: `- [ ]` not started · `- [~]` in progress · `- [x]` done · `- [n/a]` verified
 not applicable.
@@ -84,7 +85,8 @@ not applicable.
 - [ ] **[BREAK]** Writing anything into a mod directory — mod dirs are read-only since
       5.9, and writes are *disallowed* since 5.16. → `core.get_mod_data_path()` / world path. ([5.9](#59), [5.16](#516))
 - [ ] **[BREAK]** Vectors with `nil` components passed to engine functions error since 5.13. ([5.13](#513))
-- [ ] **[BREAK]** `.bmp` textures stop working on clients ≥ 5.11. ([5.11](#511))
+- [n/a] **[BREAK]** `.bmp` textures stop working on clients ≥ 5.11. ([5.11](#511))
+      — zero `.bmp` files in the tree (measured 2026-07-30, §7.1.2).
 - [ ] **[BREAK]** Re-using one table for two `register_node`/`register_craftitem`/`register_tool`
       calls — the table is modified; stricter checks since 5.12. ([5.12](#512))
 - [ ] **[BREAK]** `liquid_alternative_source` / `liquid_alternative_flowing` are mandatory
@@ -99,7 +101,8 @@ not applicable.
 
 These are the ones the log-driven sweep (§0.1) will hand you directly.
 
-- [ ] **[WARN]** `player:get_attribute` / `set_attribute` → `player:get_meta()`. ([5.0](#legacy))
+- [x] **[WARN]** `player:get_attribute` / `set_attribute` → `player:get_meta()`. ([5.0](#legacy))
+      — zero call sites remain (measured 2026-07-30, §7.1.2); finished by `0cf5fa2a`.
 - [ ] **[WARN]** `obj:set_bone_position` / `get_bone_position` → `set_bone_override` / `get_bone_override`. ([5.9](#59))
 - [ ] **[WARN]** `use_texture_alpha = true/false` → `"opaque"` / `"clip"` / `"blend"`. ([5.4](#54))
 - [x] **[WARN]** TileDef `image = ...` → `name = ...`. — done in commit `09cecc8d`
@@ -110,11 +113,14 @@ These are the ones the log-driven sweep (§0.1) will hand you directly.
       **essentially done**: census of all 142 mods found only `mods/cooking` and
       `mods/cooking_fr` lacking `mod.conf` (both are submodules, both still have
       `depends.txt`); zero `description.txt` remain. ([5.5](#55), [5.6](#56), §7.1)
-- [ ] **[WARN]** `hud_elem_type` → `type` in HUD definitions. ([5.9](#59))
+- [n/a] **[WARN]** `hud_elem_type` → `type` in HUD definitions. ([5.9](#59))
+      — zero hits (measured 2026-07-30, §7.1.2).
 - [ ] **[WARN]** craftitem/tool `image` → `inventory_image`; tool caps directly in def → `tool_capabilities`;
       `cookresult_itemstring` / `furnace_burntime` → `core.register_craft`. ([legacy](#legacy))
-- [ ] **[WARN]** `core.env:foo()`, `core.setting_*`, `core.register_on_auth_fail`,
+- [~] **[WARN]** `core.env:foo()`, `core.setting_*`, `core.register_on_auth_fail`,
       `core.register_async_metatable`, `core.get_node_group`. ([legacy](#legacy), [5.3](#53), [5.9](#59))
+      — measured 2026-07-30 (§7.1.2): `core.env` **59 hits / 14 files** (mostly `beer_test`),
+      `get_node_group` **1**. The other three are **zero** and need no work.
 - [ ] **[WARN]** `core.set_player_privs(name, {priv = false})` — pass only `true` values,
       or use `core.change_player_privs`. ([5.9](#59))
 
@@ -152,6 +158,7 @@ Append one line per working session so the next session knows where it stopped.
 | 2026-07-30 | — | `MODERNIZATION.md` written; no code changes yet. luacheck baseline recorded in §7.1. |
 | 2026-07-30 | §7.5 steps 1, 2 | `alpha_workaround_minus` submodule bumped `fc8f9df` → `a4f9749` (upstream HEAD). `.luacheckrc` `read_globals` extended: 3579 → 3341 warnings, W113 540 → 302, 0 errors (§7.1.1). The 302 survivors are now classified into a real bug queue (§7.1.1). |
 | 2026-07-30 | §7.6 | Upstream import protocol defined and `tools/verify-upstream-imports.sh` checked in (positive + both negative cases tested). No mod upgraded yet. Corrected `enable_shadows` upstream URL in §7.2.2. |
+| 2026-07-30 | §7.1.2, §7.5 | **Strategy change: fix deprecations directly, upgrade only where free.** Measured the whole deprecation surface (§7.1.2) — small, and concentrated in mods that have no upstream. §7.5 restructured around it; §7.3/§7.6 demoted to opportunistic and given the world-compatibility warning they were missing. |
 
 ---
 
@@ -1142,6 +1149,55 @@ Three distinct classes, not one:
    these. Since nothing assigns them, **the intended defaults are silently inactive** — worth
    checking per mod (`fishing`, `thirsty`, `3d_armor`) rather than mass-fixing.
 
+### 7.1.2 Measured deprecation surface — 2026-07-30
+
+Grepped across all 805 Lua files. **This is the work queue.** It is small: a few hundred
+edit sites in roughly 60–80 files, which is what makes fixing deprecations directly the
+main line of work rather than a fallback (§7.5).
+
+| Item | Hits | Files | Kind | Concentrated in |
+|---|---|---|---|---|
+| `get_objects_inside_radius` | 63 | 41 | audit | everywhere |
+| `core.env:` / `core.env.` | 59 | 14 | mechanical | `beer_test` (7 files), then 1 file each in `streets`, `soccer`, `money3`, `memorandum`, `jobs`, `itemframes`, `3d_armor` |
+| `set_player_privs` | 28 | 10 | audit | — |
+| `set_physics_override` | 22 | 11 | audit | the 5.8 acceleration change |
+| `register_entity` without `initial_properties` | 29 | 29 | mechanical | 23 mods; `medical` 4, `fishing` 3, `display_modpack` 2, rest 1 each |
+| `use_texture_alpha = true/false` | 7 | 5 | mechanical | `medical` (3), `cooking` (2) |
+| `get_player_velocity` / `add_player_velocity` | 7 | 7 | mechanical | — |
+| `set_bone_position` / `get_bone_position` | 5 | 3 | **careful** | `cars`, `frisk`, `character_anim` — degrees→radians |
+| `register_on_player_hpchange` | 5 | 5 | audit | — |
+| `get_entity_name` | 5 | 5 | mechanical | — |
+| `LMB`/`RMB` | 9 | 6 | mechanical | — |
+| `get_node_group` | 1 | 1 | mechanical | — |
+| `degrotate` | 1 | 1 | audit | — |
+| `*_normal.png` | 1 | — | delete | dead since 5.4 |
+| `get_attribute`/`set_attribute` | **0** | 0 | — | done in `0cf5fa2a` |
+| `hud_elem_type` | **0** | 0 | — | never present |
+| `core.setting_*` | **0** | 0 | — | never present |
+| `register_on_auth_fail` | **0** | 0 | — | never present |
+| `register_async_metatable` | **0** | 0 | — | never present |
+| `.bmp` textures | **0** | 0 | — | nothing to convert |
+
+**Do not trust two of these without eyeballing them:** the 22 `^\s*weight *=` and 3
+`^\s*colors *=` hits are probably mostly false positives — `weight` is also a mob-spawn and
+biome field, and `colors` is used by unrelated APIs. They are omitted from the table above
+for that reason; check them by hand before treating either as a fix.
+
+Re-run with:
+
+```sh
+grep -rE '<pattern>' mods/ --include='*.lua' | wc -l     # hits
+grep -rlE '<pattern>' mods/ --include='*.lua' | wc -l    # files
+```
+
+Note the quoting: under zsh an unquoted `--include=*.lua` is glob-expanded before grep
+sees it and silently reports zero everywhere.
+
+Grep cannot see the runtime-only surface — which of the 63 `get_objects_inside_radius`
+call sites actually mutate the world mid-iteration, whether an entity's properties are
+read via `self.foo`, or anything reached only through gameplay. That is what the
+log-driven pass (§7.5) is for; the two are complementary, not redundant.
+
 ### 7.2 Mod inventory and upstream comparison
 
 #### Method
@@ -1325,7 +1381,18 @@ The heavily-forked group is unambiguously this game's own and carries its identi
 
 ### 7.3 Upstream-upgrade procedure
 
-Applies to **every** mod in 7.2.1 and 7.2.2, regardless of band:
+> ⚠ **An upgrade can break existing worlds. A deprecation fix essentially cannot.**
+> Upstream may have renamed or removed nodes and items since this game imported the mod;
+> anything already placed in a world whose itemstring disappears becomes `unknown node`,
+> and no alias exists unless upstream wrote one. Nothing in the §7.6 verification catches
+> this — a byte-exact import is still byte-exact when it deletes a node your players built
+> with. Before upgrading, diff the set of registered itemstrings, not just the source, and
+> check upstream for `register_alias` calls covering anything that moved.
+>
+> This asymmetry is why §7.5 demotes upgrading to opportunistic work.
+
+Applies to any mod in 7.2.1 or 7.2.2 that §7.5 has selected for upgrade — since 2026-07-30
+that means the `exact-tree-match` cases and `3d_armor`, not the whole inventory:
 
 1. Identify upstream and the version the game most likely started from. For ContentDB
    packages the repo URL is in the package detail API
@@ -1365,48 +1432,107 @@ Record diff outcomes here, including negative results.
 | _(all)_ | not started | no | — | Repo-wide commits so far: `09cecc8d` (TileDef `image`→`name`), `ee1815e1` (`get_connected_players` at load time), `b6a49a94` (`getpos`→`get_pos`), `0cf5fa2a` (player meta instead of `[gs]et_attribute`), `01319573` (removed overridden mesecons playerdetector) |
 | `alpha_workaround_minus` | **at upstream HEAD** | yes — submodule, no local commits on top | — | Bumped `fc8f9df` → `a4f9749` on 2026-07-30. Clean fast-forward, no local customizations to re-apply. Still a band-aid: retire it once `use_texture_alpha` is set per node (§1.3, §7.5 step 8). |
 
-### 7.5 Recommended order of attack
+### 7.5 Order of attack
 
-Cheapest and most mechanical first, so the risky audits happen once the noise is gone.
+**Strategy, revised 2026-07-30: fix the deprecations directly. Upgrade only where it is
+free.** Mass-upgrading the vendored mods was the earlier plan; it is demoted to an
+opportunistic optimization. Three reasons, in descending weight:
+
+1. **Most of the debt sits in mods that have no upstream to upgrade to.** `set_bone_position`
+   lives in `cars`, `frisk`, `character_anim`; `use_texture_alpha = bool` in `medical` and
+   `cooking`; the `initial_properties` list is led by `medical` and `fishing`. The 61
+   custom/heavily-forked mods of §7.2.3 — including the six carrying this game's identity —
+   must be hand-fixed no matter what. Deprecation work is therefore *mandatory*; upgrading
+   was only ever an accelerator for a subset.
+2. **Upgrades can break existing worlds; deprecation fixes essentially cannot.** A mod
+   upgrade can rename or remove nodes and items, which surfaces as `unknown node` in worlds
+   that are already built. See the warning in §7.3.
+3. **The measured surface is small** — a few hundred edit sites in 60–80 files (§7.1.2),
+   against 19+ mod upgrades each carrying years of unknown upstream churn.
+
+Upgrading still wins in two cases, both handled by §7.6: a mod that anchors
+`exact-tree-match` (pristine upstream, zero local changes) modernizes for free in a single
+verified commit; and `3d_armor` at 0.4.11, which is old enough to appear in three separate
+rows of §7.1.2 and has years of upstream fixes behind it.
+
+**Sequencing trap:** do not hand-fix a mod you intend to upgrade. The fix is discarded, and
+worse, it becomes a spurious "customization" that §7.6's reapply step will faithfully carry
+forward. Since fixes run 1–5 lines for most mods this only really binds on `3d_armor` —
+decide that one before touching it.
+
+#### Done / in progress
 
 - [x] 1. **`alpha_workaround_minus` → upstream HEAD.** Submodule pointer bumped
       `fc8f9df` → `a4f9749` (2026-07-30).
-- [~] 2. **Static pass, no game needed.** `.luacheckrc` `read_globals` extended (§7.1) —
-      done. Remaining: work the 302 surviving W113 hits, which are now a real bug queue
-      rather than noise (§7.1.1).
-- [ ] 3. **Work the band-1 mods in 7.2.2 through the §7.3 procedure.** Expect many empty or
-      near-empty diffs, which convert into clean upgrades and let upstream's own
-      modernization do the work for you — but confirm each diff rather than assuming.
-- [ ] 4. **Establish the MTG base version** (§7.3), then work 7.2.1 the same way.
-- [ ] 5. **`3d_armor` 0.4.11 → current.** Oldest pinned snapshot, 43 focused commits.
-      Budget real time; expect to hit item 9 below while doing it.
-- [ ] 6. **Identify the unidentified mods** (§7.2.3) by title/description search on
-      ContentDB. Every one you identify converts hand-migration into an upgrade.
-- [ ] 7. **Log-driven pass.** `debug_log_level = info`, default
-      `deprecated_lua_api_handling = log`, start the game, exercise the main systems
-      (build, dig, craft, cars, elevators, digilines, armour, jobs), then work through
-      `debug.txt`. Unexercised code paths stay silent, so this does not replace grepping
-      for the §1.2 items.
-- [ ] 8. `use_texture_alpha` per node in the band 3/4 and custom mods; then retire
-      `alpha_workaround_minus`.
-- [ ] 9. `get_attribute`/`set_attribute` → `get_meta()` (partly done, see `0cf5fa2a`).
-- [ ] 10. `set_bone_position` → `set_bone_override` — **watch degrees vs radians**.
-      Likely hits `3d_armor`/`wieldview`, `character_anim`, `charactercreation`.
-- [ ] 11. Entity definitions → `initial_properties`; drop `weight` and `colors`.
-      Likely hits `cars`, `spriteguns`, `mobs_redo`, `mobs_farm`, `army`.
-- [ ] 12. Any file writes into mod directories.
-- [ ] 13. `liquid_alternative_*` completeness on every custom liquid
-      (`dynamic_liquid`, `waterworks`, `static_ocean`, `oil`, `gas_lib`, `bucket`).
-- [ ] 14. `.bmp` textures and `*_normal.png` normal maps.
-- [ ] 15. `LMB`/`RMB` → `dig`/`place`; `up`/`down`/`left`/`right` → `movement_x`/`movement_y`.
-      Likely hits `playercontrol`, `controls`, `sprint`, `cars`.
-- [ ] 16. `mod.conf` for `mods/cooking` and `mods/cooking_fr` (the only two left, both
+- [~] 2. **Static pass, no game needed.** `.luacheckrc` `read_globals` extended (§7.1.1) —
+      done. Remaining: work the 302 surviving W113 hits, now a real bug queue rather than
+      noise. Start with `minetet` (a typo for `minetest`, guaranteed live bug).
+
+#### Generate the queue
+
+- [ ] 3. **Log-driven pass — do this first, it is now the primary work-generator.**
+      `debug_log_level = info`, default `deprecated_lua_api_handling = log`. Start a
+      headless server: that alone exercises every `register_*` call and surfaces most of
+      §1.2 plus all of §1.1's hard errors, with backtraces to exact call sites, before any
+      gameplay. Then exercise the main systems (build, dig, craft, cars, elevators,
+      digilines, armour, jobs) for the runtime-only paths. Unexercised code stays silent,
+      so this complements §7.1.2's greps rather than replacing them.
+
+#### Mechanical sweeps — counts from §7.1.2
+
+- [ ] 4. `core.env:foo()` → `core.foo()`. 59 hits / 14 files, mostly `beer_test`.
+- [ ] 5. Entity definitions → `initial_properties`; read via `self.initial_properties.x`.
+      29 files across 23 mods. Check `weight`/`colors` by hand here (§7.1.2 caveat).
+- [ ] 6. `use_texture_alpha = true/false` → `"opaque"`/`"clip"`/`"blend"`. 7 hits / 5 files.
+- [ ] 7. `get_player_velocity`/`add_player_velocity` → `get_velocity`/`add_velocity`. 7 / 7.
+- [ ] 8. `get_entity_name()` → `get_luaentity().name`. 5 / 5.
+- [ ] 9. `get_node_group` → `get_item_group`. 1 / 1.
+- [ ] 10. Delete the one `*_normal.png`; `.bmp` count is already zero.
+- [ ] 11. `LMB`/`RMB` → `dig`/`place`; `up`/`down`/`left`/`right` → `movement_x`/`movement_y`.
+      9 / 6. Likely `playercontrol`, `controls`, `sprint`, `cars`.
+- [ ] 12. `mod.conf` for `mods/cooking` and `mods/cooking_fr` (the only two left, both
       submodules); delete their `depends.txt`.
+
+#### Audits — no warning will fire, each needs judgement
+
+- [ ] 13. `set_bone_position` → `set_bone_override` in `cars`, `frisk`, `character_anim`.
+      Only 5 call sites, but **degrees→radians and `absolute` defaults to false** — the
+      easiest item here to get silently wrong.
+- [ ] 14. `get_objects_inside_radius` → `core.objects_inside_radius`. 63 hits / 41 files, but
+      only the call sites whose loop body mutates the world are actually unsafe. Triage
+      rather than sweeping; the log-driven pass shows which ones run hot.
+- [ ] 15. `set_physics_override` — the 5.8 change makes `speed` scale acceleration too.
+      22 hits / 11 files.
+- [ ] 16. `set_player_privs` — pass a set of `true` values, or use `change_player_privs`.
+      28 hits / 10 files.
+- [ ] 17. `register_on_player_hpchange` — HP clamping removed in 5.10. 5 / 5.
+- [ ] 18. `liquid_alternative_*` completeness on every custom liquid
+      (`dynamic_liquid`, `waterworks`, `static_ocean`, `oil`, `gas_lib`, `bucket`).
+      Missing values are a **hard registration error** since 5.12, so item 3 catches these.
+- [ ] 19. Any file writes into mod directories — hard error since 5.16, so item 3 catches
+      these too.
+- [ ] 20. The single `degrotate` hit — rotation step changed 2° → 1.5° in 5.5, so stored
+      param2 in existing worlds renders differently.
+
+#### Opportunistic, not scheduled
+
+- [ ] 21. `use_texture_alpha` per node in the band 3/4 and custom mods; then retire
+      `alpha_workaround_minus`.
+- [ ] 22. Upgrade any mod that anchors `exact-tree-match` under §7.6 — free modernization,
+      one verified commit, no judgement required.
+- [ ] 23. **`3d_armor` 0.4.11 → current**, if items 4–20 leave it looking worse than a
+      rebase. 43 focused commits; budget real time.
+- [ ] 24. **Identify the unidentified mods** (§7.2.3) by title/description search on
+      ContentDB. Lower value now that upgrading is demoted, but it still converts guesswork
+      into a known upstream when a mod misbehaves.
 
 ### 7.6 Upstream import protocol — how §7.3 gets committed
 
 §7.3 says *what* to do; this says how to land it so it can be reviewed remotely without
-reading thousands of lines of upstream churn. **Follow this for every mod upgrade.**
+reading thousands of lines of upstream churn. **Follow this for every mod upgrade you do
+decide to make** — which since the 2026-07-30 revision means the `exact-tree-match` cases
+and `3d_armor` (§7.5), not a nineteen-mod batch. The protocol is unchanged by that
+demotion; there is simply less of it to run.
 
 #### Branch
 
