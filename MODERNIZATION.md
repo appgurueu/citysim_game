@@ -129,10 +129,8 @@ indistinguishable otherwise.
 - [~] **[SILENT]** `use_texture_alpha` default became `"opaque"` for **nodebox and mesh** nodes.
       Transparent nodeboxes/meshes now render opaque unless you set it explicitly. ([5.9](#59))
       — **globally mitigated already** by the `alpha_workaround_minus` submodule, which
-      back-fills the old default at `on_mods_loaded`. Two follow-ups: (a) that mod has an
-      operator-precedence bug that downgrades correct `"blend"` mesh nodes to `"clip"`
-      (§7.2.5, fix first); (b) the workaround is a band-aid — set `use_texture_alpha`
-      per node and then retire it.
+      back-fills the old default at `on_mods_loaded`. Follow-up: the workaround is a
+      band-aid — set `use_texture_alpha` per node and then retire it.
 - [ ] **[SILENT]** The `hand` inventory list now *entirely replaces* the hand, instead of
       only "enhancing" its tool capabilities. ([5.12](#512))
 - [ ] **[SILENT]** `set_physics_override{speed = x}` now scales acceleration too. ([5.8](#58))
@@ -152,6 +150,7 @@ Append one line per working session so the next session knows where it stopped.
 | Date | Items touched | Notes |
 |---|---|---|
 | 2026-07-30 | — | `MODERNIZATION.md` written; no code changes yet. luacheck baseline recorded in §7.1. |
+| 2026-07-30 | §7.5 steps 1, 2 | `alpha_workaround_minus` submodule bumped `fc8f9df` → `a4f9749` (upstream HEAD). `.luacheckrc` `read_globals` extended: 3579 → 3341 warnings, W113 540 → 302, 0 errors (§7.1.1). The 302 survivors are now classified into a real bug queue (§7.1.1). |
 
 ---
 
@@ -1071,19 +1070,76 @@ any of it:
   | W111 | 111 | setting non-standard global | **real** — matches the engine's "Assignment to undeclared global variable" |
   | W122 | 64 | setting read-only field of a global | **interesting** — mods monkeypatching `minetest.*` / `core.*` / `table.*` |
 
-  `luacheck mods/ --only 1` narrows to the 989 global-related ones. Caveats:
-  * Most W113 hits are **cross-mod API globals**, not bugs: `digiline` (46), `intllib` (42),
-    `mssg` (21), `sgnd` (18), `stairsplus` (15), `money` (15), `cmdlib` (13),
-    `unifieddyes` (11), `craftguide` (11), `toolranks` (10), `cmi` (9), `mg` (9).
-    Fix by extending `read_globals` in `.luacheckrc`, not by touching code.
+  `luacheck mods/ --only 1` narrows to the global-related ones. Caveats:
+  * Many W113 hits are **cross-mod API globals**, not bugs: `digiline` (46), `intllib` (42),
+    `stairsplus` (15), `money` (15), `cmdlib` (13), `unifieddyes` (11), `craftguide` (11),
+    `toolranks` (10), `cmi` (9), `mg` (9). Fixed by extending `read_globals` in
+    `.luacheckrc`, not by touching code — **done 2026-07-30**, see §7.1.1.
   * The genuine accidental globals hide among the short names: `i`, `pos`, `meta`,
     `timer`, `r`, `formspec`, `newFull`.
   * `minetest` (42), `core` (21), `table` (24) appear as W122 — mods assigning into the
     engine namespace. `.luacheckrc` already whitelists `mods/creative/init.lua`.
-* `.luacheckrc`'s `read_globals` predates much of the API surface in this document. It is
-  missing at least `PcgRandom`, `SecureRandom`, `AreaStore`, `Raycast`,
-  `PerlinNoise`/`PerlinNoiseMap`, `ValueNoise`/`ValueNoiseMap` and `vector2`. It also
-  lists `DIR_DELIM`, which is on the §6 removal list.
+* **Correction (2026-07-30):** `mssg` and `sgnd` were listed above as cross-mod API false
+  positives. They are not — both are **assigned inside this tree**, so they are this game's
+  own inter-mod globals (or accidental ones) and were deliberately *not* whitelisted.
+  Measured counts under `--only 113` are 9 and 6, not 21 and 18.
+
+### 7.1.1 `.luacheckrc` `read_globals` pass — done 2026-07-30
+
+`read_globals` predated much of the API surface in this document. Extended with the engine
+globals it was missing (`PcgRandom`, `SecureRandom`, `AreaStore`, `Raycast`,
+`PerlinNoise`/`PerlinNoiseMap`, `ValueNoise`/`ValueNoiseMap`, `vector2`) plus the external
+third-party mod APIs. `DIR_DELIM` was kept — it is on the §6 removal list but is still
+referenced here — and is now commented as such.
+
+**Result: 3579 → 3341 total warnings; W113 540 → 302; `--only 1` 989 → 751. Still 0 errors.**
+Total fell by exactly the W113 reduction, so no `W122`/read-only-assignment warnings were
+introduced by the whitelist.
+
+#### The method — reuse this before whitelisting anything else
+
+A name was classified as external **only if it is read but never assigned anywhere in this
+tree**, established by cross-referencing the W113 reads against the W111 + W131 assignments:
+
+```sh
+luacheck mods/ --only 113 --no-color | grep -oE "accessing undefined variable '[^']+'" \
+    | sed "s/.*'\(.*\)'/\1/" | sort -u > /tmp/read.txt
+luacheck mods/ --only 111 --no-color | grep -oE "setting non-standard global variable '[^']+'" \
+    | sed "s/.*'\(.*\)'/\1/" | sort -u > /tmp/set.txt
+luacheck mods/ --only 131 --no-color | grep -oE "unused global variable '[^']+'" \
+    | sed "s/.*'\(.*\)'/\1/" | sort -u >> /tmp/set.txt
+sort -u /tmp/set.txt -o /tmp/set.txt
+comm -23 /tmp/read.txt /tmp/set.txt   # never assigned here -> external API, or a typo
+comm -12 /tmp/read.txt /tmp/set.txt   # assigned here too   -> in-tree global, or missing `local`
+```
+
+Note `--no-color`: luacheck wraps the variable name in ANSI escapes, so a `'...'` grep
+silently matches nothing against colourised output.
+
+The whitelist was kept **deliberately conservative** — ambiguous names were left out so they
+stay visible in the queue. A false positive there costs a minute of review; a wrongly
+whitelisted missing-`local` bug is hidden permanently.
+
+#### The 302 survivors — this is the work queue for §7.5 step 2
+
+Three distinct classes, not one:
+
+1. **Read *and* assigned in-tree (~45 names)** — the classic missing-`local` bugs. Contains
+   every name §7.1 predicted (`i`, `pos`, `meta`, `timer`, `r`, `formspec`, `newFull`) plus
+   `b`, `g`, `s`, `buf`, `params`, `path`, `player`, `result`, `row`, `fuel`, `factor`,
+   `message`, `childpos`, `stackname`, `bottom_pos`, `bottom_node`, `shadowpos`,
+   `open_meta`, `open_env`, `pl_formspec`, `pl_receive_fields`, `sound_open`, `sound_close`,
+   `hue2rgb`, `injurydef`, `mod_list`, `diggername`, `puddlesize`, `bloodsize`, and others.
+2. **Read but never assigned anywhere** — these always evaluate to `nil` at runtime. Includes
+   outright typos: **`minetet`** (for `minetest` — a guaranteed live bug),
+   `puddlepuddlesize` (for `puddlesize`), `desc_element_eigthslab_double`.
+3. **Uppercase per-mod config globals, read but never set** — `ARMOR_MATERIALS`,
+   `ARMOR_FIRE_NODES`, `WORM_CHANCE`, `WORM_IS_MOB`, `NEW_WORM_SOURCE`, `TREASURE_CHANCE`,
+   `TREASURE_RANDOM_ENABLE`, `SHARK_CHANCE`, `FISH_CHANCE`, `ESCAPE_CHANCE`, `SHARED_AMOUNT`,
+   `BOBBER_VIEW_RANGE`, `SIMPLE_DECO_FISHING_POLE`, `WEAR_OUT`, `MESSAGES`, `HUD_THIRST_POS`,
+   `HUD_THIRST_OFFSET`, `HUD_SB_SIZE`. The old-mod convention where a settings file defines
+   these. Since nothing assigns them, **the intended defaults are silently inactive** — worth
+   checking per mod (`fishing`, `thirsty`, `3d_armor`) rather than mass-fixing.
 
 ### 7.2 Mod inventory and upstream comparison
 
@@ -1259,44 +1315,12 @@ The heavily-forked group is unambiguously this game's own and carries its identi
 * **`mobs_redo`'s ContentDB package is named `mobs`** (author TenPlus1, repo `mobs_redo`) —
   a genuine mod-name/package-name mismatch, so name matching alone under-reports.
 * **`alpha_workaround_minus` already mitigates the 5.9 `use_texture_alpha` change globally**
-  — and it has a bug. See §7.2.5.
+  by back-filling the old default at `on_mods_loaded`. It is a deliberate band-aid — its own
+  comment says "could be missing some registrations but i don't really care" — so the
+  long-term plan is to set `use_texture_alpha` per node and retire it.
 * Directory names pin three snapshots explicitly: `3d_armor-version-0.4.11`,
   `WorldEdit-1.2`, `midi-modpack-master`. `3d_armor` at 0.4.11 is very old and carries 43
   focused commits on top — the single most valuable upgrade target, and also the most work.
-
-#### 7.2.5 Bug found in `alpha_workaround_minus`
-
-The mod overrides `use_texture_alpha` for mesh/nodebox nodes at `on_mods_loaded`. Its
-condition is:
-
-```lua
-if def.drawtype == "mesh" or def.drawtype == "nodebox" and type(def.use_texture_alpha) ~= "string" then
-```
-
-`and` binds tighter than `or`, so this parses as
-`(drawtype == "mesh") or ((drawtype == "nodebox") and (type(...) ~= "string"))`. The
-string guard therefore **only applies to the nodebox branch**. Verified behaviour:
-
-| drawtype | existing `use_texture_alpha` | matches? | overridden to |
-|---|---|---|---|
-| `mesh` | `"blend"` | yes | **`"clip"`** ← bug |
-| `mesh` | `"clip"` | yes | `"clip"` |
-| `mesh` | `nil` | yes | `"clip"` |
-| `nodebox` | `"blend"` | no | *(correctly skipped)* |
-| `nodebox` | `nil` | yes | `"clip"` |
-
-So **every mesh node that correctly declares `use_texture_alpha = "blend"` is silently
-downgraded to `"clip"`**, losing semitransparency. Fix by parenthesising:
-
-```lua
-if (def.drawtype == "mesh" or def.drawtype == "nodebox")
-        and type(def.use_texture_alpha) ~= "string" then
-```
-
-This is a submodule (`codeberg.org/appgurueu/alpha_workaround_minus`), so the fix belongs
-upstream plus a pointer bump. The mod is a deliberate band-aid — its own comment says
-"could be missing some registrations but i don't really care" — so the long-term plan is to
-set `use_texture_alpha` correctly per node and retire the workaround.
 
 ### 7.3 Upstream-upgrade procedure
 
@@ -1330,15 +1354,17 @@ Record diff outcomes here, including negative results.
 | Mod | Status | Diffed vs upstream? | Items done | Notes |
 |---|---|---|---|---|
 | _(all)_ | not started | no | — | Repo-wide commits so far: `09cecc8d` (TileDef `image`→`name`), `ee1815e1` (`get_connected_players` at load time), `b6a49a94` (`getpos`→`get_pos`), `0cf5fa2a` (player meta instead of `[gs]et_attribute`), `01319573` (removed overridden mesecons playerdetector) |
+| `alpha_workaround_minus` | **at upstream HEAD** | yes — submodule, no local commits on top | — | Bumped `fc8f9df` → `a4f9749` on 2026-07-30. Clean fast-forward, no local customizations to re-apply. Still a band-aid: retire it once `use_texture_alpha` is set per node (§1.3, §7.5 step 8). |
 
 ### 7.5 Recommended order of attack
 
 Cheapest and most mechanical first, so the risky audits happen once the noise is gone.
 
-- [ ] 1. **Fix the `alpha_workaround_minus` precedence bug** (§7.2.5). One-line upstream
-      fix; it is silently corrupting mesh transparency today.
-- [ ] 2. **Static pass, no game needed.** Extend `.luacheckrc` `read_globals` (§7.1), then
-      `luacheck mods/ --only 1` and fix the genuine missing-`local` bugs.
+- [x] 1. **`alpha_workaround_minus` → upstream HEAD.** Submodule pointer bumped
+      `fc8f9df` → `a4f9749` (2026-07-30).
+- [~] 2. **Static pass, no game needed.** `.luacheckrc` `read_globals` extended (§7.1) —
+      done. Remaining: work the 302 surviving W113 hits, which are now a real bug queue
+      rather than noise (§7.1.1).
 - [ ] 3. **Work the band-1 mods in 7.2.2 through the §7.3 procedure.** Expect many empty or
       near-empty diffs, which convert into clean upgrades and let upstream's own
       modernization do the work for you — but confirm each diff rather than assuming.
