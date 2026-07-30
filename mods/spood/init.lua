@@ -359,7 +359,6 @@ minetest.register_decoration({
 	y_min = 5,
 	y_max = 100,
 	decoration = {"farming:spood_8"},
-	num_spawn_by = 1,
 })
 
 bucket.register_liquid(
