@@ -29,7 +29,7 @@ minetest.register_node("beer_test:growing_rope", {
 			local tool = puncher:get_wielded_item():get_name()
 			if tool and tool == "beer_test:growing_rope_down" then
 				node.name = "beer_test:growing_rope_1"
-				minetest.env:set_node(pos, node)
+				minetest.set_node(pos, node)
 				puncher:get_inventory():remove_item("main", ItemStack("beer_test:growing_rope_down"))
 			end
 		end
@@ -161,7 +161,7 @@ drawtype = "nodebox",
 			local tool = puncher:get_wielded_item():get_name()
 			if tool and tool == "" then
 				node.name = "beer_test:hops_9"
-				minetest.env:set_node(pos, node)
+				minetest.set_node(pos, node)
 				puncher:get_inventory():add_item("main", ItemStack("beer_test:hops"))
 			end
 		end

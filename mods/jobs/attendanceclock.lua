@@ -59,7 +59,7 @@ end)
 
 function jobs.punch(name, pos)
 	if not name or not pos then return end
-	local meta = minetest.env:get_meta(pos)
+	local meta = minetest.get_meta(pos)
 	if not meta then return end
 	local jobname = meta:get_string("jobname")
 	if jobname == "" or not jobs.list[jobname] then return end
@@ -181,7 +181,7 @@ minetest.register_node("jobs:clock", {
 	groups = {oddly_breakable_by_hand = 3},
 	sounds = default.node_sound_stone_defaults(),
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		if meta:get_string("formspec") ~= "" then return end
 		local name = clicker:get_player_name()
 		if not name or not meta then return end
@@ -197,12 +197,12 @@ minetest.register_node("jobs:clock", {
 		minetest.show_formspec(name, "jobs_attendanceclock", employee_form(punchedin, name, jobname, meta:get_string("radius"), meta:get_string("maxshift")))
 	end,
 	on_construct = function(pos, placer, itemstack, pointed_thing)	--Initialize some variables (local per instance)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext", "Attendance Clock not set up.")
 		meta:set_string("formspec", setup_form)
 	end,
 	on_receive_fields = function(pos, formname, fields, player)
-        local meta = minetest.env:get_meta(pos)
+        local meta = minetest.get_meta(pos)
 		local name = player:get_player_name()
 		if not name or not meta then return end
 		if fields.jobname and jobs.list[fields.jobname] and fields.radius and tonumber(fields.radius) and fields.maxshift and tonumber(fields.maxshift) then

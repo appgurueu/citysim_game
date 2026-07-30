@@ -62,11 +62,11 @@ minetest.register_node("clothes:loom", {
 		},
 	},
 	after_place_node = function(pos, placer)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext", "Loom")
 	end,
 	can_dig = function(pos,player)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		if not inv:is_empty("input") or not inv:is_empty("output") then
 			return false
@@ -74,7 +74,7 @@ minetest.register_node("clothes:loom", {
 		return true
 	end,
 	on_construct = function(pos)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", "invsize[10,11;]"..
 			"background[-0.15,-0.25;10.40,11.75;clothing_loom_background.png]"..
 			"list[current_name;input;7,2;1,1;]"..
@@ -89,7 +89,7 @@ minetest.register_node("clothes:loom", {
 		inv:set_size("output", 1)
 	end,
 	on_receive_fields = function(pos, formname, fields, sender)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local node = inv:get_stack("input", 1):get_name()
 		if minetest.get_item_group(node, "wool") < 1 then

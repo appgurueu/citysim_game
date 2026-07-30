@@ -25,7 +25,7 @@ local function reg_ball(color)
 				local vel = self.object:getvelocity()
 				local p = self.object:get_pos();
 				p.y = p.y - 0.5
-				if minetest.registered_nodes[minetest.env:get_node(p).name].walkable then
+				if minetest.registered_nodes[minetest.get_node(p).name].walkable then
 					vel.x = vel.x * 0.85
 					if vel.y < 0 then vel.y = vel.y * -0.65 end
 					vel.z = vel.z * 0.90
@@ -37,7 +37,7 @@ local function reg_ball(color)
 				end
 				self.object:setvelocity(vel)
 				local pos = self.object:get_pos()
-				local objs = minetest.env:get_objects_inside_radius(pos, 1)
+				local objs = minetest.get_objects_inside_radius(pos, 1)
 				local player_count = 0
 				local final_dir = { x=0, y=0, z=0 }
 				for _,obj in ipairs(objs) do
@@ -90,7 +90,7 @@ local function reg_ball(color)
 		on_place = function(itemstack, placer, pointed_thing)
 			local pos = pointed_thing.above
 			--pos = { x=pos.x+0.5, y=pos.y, z=pos.z+0.5 }
-			local ent = minetest.env:add_entity(pos, ball_ent_name)
+			local ent = minetest.add_entity(pos, ball_ent_name)
 			ent:setvelocity({x=0, y=-15, z=0})
 			itemstack:take_item()
 			return itemstack

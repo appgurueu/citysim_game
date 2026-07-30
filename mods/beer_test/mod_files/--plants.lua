@@ -112,7 +112,7 @@ minetest.register_node("beer_test:hops_grow", {
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:crop" then
 			node.name = "beer_test:hops_8"
-			minetest.env:set_node(pos, node)
+			minetest.set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:crop"))
 		end
 	end
@@ -403,14 +403,14 @@ minetest.register_node("beer_test:crop", {
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:seed_hops" then
 			node.name = "beer_test:hops_1"
-			minetest.env:set_node(pos, node)
+			minetest.set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:seed_hops"))
 		end
 
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:seed_oats" then
 			node.name = "beer_test:oats_1"
-			minetest.env:set_node(pos, node)
+			minetest.set_node(pos, node)
 			puncher:get_inventory():remove_item("main", ItemStack("beer_test:seed_oats"))
 
 		end

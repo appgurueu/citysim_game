@@ -52,7 +52,7 @@ minetest.register_node("beer_test:barrel_mixed_ale_grain", {
         local tool = puncher:get_wielded_item():get_name()
         if tool and tool == "beer_test:mixed_ale_grain" then
             node.name = "beer_test:barrel_mixed_ale_grain"
-            minetest.env:set_node(pos, node)
+            minetest.set_node(pos, node)
             puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_ale_grain"))
         end
     end
