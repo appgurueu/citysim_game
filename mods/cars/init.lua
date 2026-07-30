@@ -1313,9 +1313,16 @@ local function car_step(self, dtime, moveresult)
 			
 			-- Rotation is radians here, unlike the set_attach call below which
 			-- takes degrees.
+			-- The X and Z half-turns are the "steering" bone's own bind rotation
+			-- (180 degrees about Y, the same in every car model). Clients before
+			-- 5.11 decomposed that into a negative scale and applied it on top of
+			-- this override for us, so the angle used to be just (0, 0, -wheelpos*8);
+			-- since the fix it has to be composed in here. Consequence: on 5.9 and
+			-- 5.10 clients the wheel is now a half-turn out. See MODERNIZATION.md
+			-- §1.3 and https://luatic.dev/posts/breaking-bones/.
 			self.object:set_bone_override("steering", {
 				position = {vec = vector.copy(def.steeringwheel), absolute = true},
-				rotation = {vec = vector.new(0, 0, math.rad(-self.wheelpos*8)), absolute = true},
+				rotation = {vec = vector.new(math.pi, 0, math.rad(180 - self.wheelpos*8)), absolute = true},
 			})
 		end
 		local carroll = 0

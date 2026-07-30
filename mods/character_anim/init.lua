@@ -1,4 +1,6 @@
-assert(modlib.version >= 93, "character_anim requires at least version rolling-93 of modlib")
+-- rolling-103 is the first release with the fixed `b3d:get_animated_bone_properties`,
+-- which no longer precomposes keyframe rotations with the bind rotation.
+assert(modlib.version >= 103, "character_anim requires at least version rolling-103 of modlib")
 
 character_anim = {}
 
@@ -21,6 +23,56 @@ local models = setmetatable({}, {__index = function(self, filename)
 	self[filename] = model
 	return model
 end})
+
+--[[
+Bind-pose ("default") bone transforms of a model, keyed by bone name.
+
+Everything below this point works in *bind-relative* rotations, because that is
+what the engine used to make of them: until Luanti 5.11, Irrlicht decomposed a
+bone's perfect 180-degree bind rotation into a negative *scale* rather than a
+rotation, and then kept applying it on top of whatever rotation an override set.
+See https://luatic.dev/posts/breaking-bones/.
+
+Every hand-tuned rotation in this file was therefore tuned against
+`rotation * bind_rotation`, so `apply_bone` composes the bind rotation back in to
+get the absolute rotation that a fixed client expects, and overrides the scale to
+stop an unfixed (but 5.9+) client from applying it a second time.
+]]
+local bind_poses = setmetatable({}, {__index = function(self, filename)
+	local model = models[filename]
+	if not model then
+		return
+	end
+	local poses = {}
+	local function collect(node)
+		if node.bone then
+			poses[node.name] = {rotation = node.rotation, scale = node.scale}
+		end
+		for _, child in pairs(node.children or {}) do
+			collect(child)
+		end
+	end
+	collect(model.node)
+	self[filename] = poses
+	return poses
+end})
+
+-- Inverse of `quaternion.to_euler_rotation`, which decomposes Rz * Ry * Rx.
+-- (`quaternion.from_euler_rotation` composes Ry * Rx * Rz, so it is *not* it.)
+local function quaternion_from_euler_rotation(euler_rotation)
+	local x = math.rad(euler_rotation.x) / 2
+	local y = math.rad(euler_rotation.y) / 2
+	local z = math.rad(euler_rotation.z) / 2
+	local cx, sx = math.cos(x), math.sin(x)
+	local cy, sy = math.cos(y), math.sin(y)
+	local cz, sz = math.cos(z), math.sin(z)
+	return {
+		sx * cy * cz - cx * sy * sz,
+		cx * sy * cz + sx * cy * sz,
+		cx * cy * sz - sx * sy * cz,
+		cx * cy * cz + sx * sy * sz
+	}
+end
 
 local players_with_interact = {}
 minetest.register_on_joinplayer(function(player, last_login)
@@ -85,11 +137,34 @@ end
 -- This mod works in degrees throughout; the engine's bone overrides take
 -- radians. Overrides are absolute, which is what set_bone_position did and
 -- what set_bone_override has to be told explicitly.
-local function apply_bone(obj, bonename, position, euler_rotation)
+-- `bind` is the bone's entry in `bind_poses`; see there for why it is composed in.
+local function apply_bone(obj, bonename, position, euler_rotation, bind)
+	local rotation, scale
+	if bind then
+		local absolute = quaternion.compose(
+			quaternion_from_euler_rotation(euler_rotation),
+			quaternion.conjugate(bind.rotation))
+		local rad = quaternion.to_euler_rotation_rad(absolute)
+		rotation = vector.new(rad.x, rad.y, rad.z)
+		-- Pinning the scale to the model's own forces a pre-5.11 client to
+		-- decompose the bind transform correctly, so it stops folding the bind
+		-- rotation into the override. Silently ignored by pre-5.9 clients.
+		scale = {vec = vector.new(unpack(bind.scale)), absolute = true}
+	else
+		rotation = vector.apply(euler_rotation, math.rad)
+	end
 	obj:set_bone_override(bonename, {
 		position = {vec = vector.copy(position), absolute = true},
-		rotation = {vec = vector.apply(euler_rotation, math.rad), absolute = true},
+		rotation = {vec = rotation, absolute = true},
+		scale = scale,
 	})
+end
+
+-- Bind pose of `bonename` for whatever model `obj` is currently using, if any.
+local function get_bind_pose(obj, bonename)
+	local props = obj:get_properties()
+	local poses = props and props.mesh and bind_poses[props.mesh]
+	return poses and poses[bonename]
 end
 
 -- Forward declaration
@@ -112,7 +187,7 @@ minetest.register_on_joinplayer(function(player)
 			if self:is_player() then
 				character_anim.set_bone_override(self, bonename, position, rotation)
 			end
-			return apply_bone(self, bonename, position, rotation)
+			return apply_bone(self, bonename, position, rotation, get_bind_pose(self, bonename))
 		end
 
 		set_animation = PlayerRef.set_animation
@@ -238,10 +313,15 @@ function handle_player_animations(dtime, player)
 	else
 		keyframe = math.min(range_max, range_min + animation_time * frame_speed)
 	end
+	local bind = bind_poses[mesh] or {}
 	local bones = {}
 	for _, props in ipairs(model:get_animated_bone_properties(keyframe, true)) do
 		local bone = props.bone_name
 		local position, rotation = modlib.vector.to_minetest(props.position), props.rotation
+		-- Make the rotation bind-relative, the convention everything below works in
+		if bind[bone] then
+			rotation = quaternion.compose(bind[bone].rotation, rotation)
+		end
 		-- Invert quaternion to match Minetest's coordinate system
 		rotation = {-rotation[1], -rotation[2], -rotation[3], rotation[4]}
 		local euler_rotation = quaternion.to_euler_rotation(rotation)
@@ -363,7 +443,8 @@ function handle_player_animations(dtime, player)
 		overridden_values = overridden_values or {}
 		apply_bone(player, bone,
 			overridden_values.position or values.position,
-			overridden_values.euler_rotation or values.euler_rotation)
+			overridden_values.euler_rotation or values.euler_rotation,
+			bind[bone])
 	end
 end
 
