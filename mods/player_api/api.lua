@@ -196,12 +196,12 @@ function player_api.globalstep()
 			if player:get_hp() == 0 then
 				player_set_animation(player, "lay")
 			elseif controls.up or controls.down or controls.left or controls.right then
-				if controls.LMB or controls.RMB then
+				if controls.dig or controls.place then
 					player_set_animation(player, "walk_mine", animation_speed_mod)
 				else
 					player_set_animation(player, "walk", animation_speed_mod)
 				end
-			elseif controls.LMB or controls.RMB then
+			elseif controls.dig or controls.place then
 				player_set_animation(player, "mine", animation_speed_mod)
 			else
 				player_set_animation(player, "stand", animation_speed_mod)

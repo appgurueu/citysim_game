@@ -22,8 +22,6 @@ minetest.register_on_joinplayer(function(player)
 		jump={false}, 
 		right={false}, 
 		left={false}, 
-		LMB={false}, 
-		RMB={false}, 
 		sneak={false}, 
 		aux1={false}, 
 		down={false}, 

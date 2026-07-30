@@ -819,7 +819,7 @@ minetest.register_globalstep(function(dtime)
 			else
 				if tbl.firing then
 					tbl.firing = nil
-					if def.loadtype == "auto" and ctrl.LMB then
+					if def.loadtype == "auto" and ctrl.dig then
 						fire(player, def)
 					elseif def.loadtype == "manual" and wear<max_wear then
 						tbl.anim = "load"

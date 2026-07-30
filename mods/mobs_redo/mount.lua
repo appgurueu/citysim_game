@@ -456,7 +456,7 @@ if not ctrl or not velo then return end
 	entity.object:set_yaw(yaw + pi + pi / 2 - entity.rotate)
 
 	-- firing arrows
-	if ctrl.LMB and ctrl.sneak and shoots then
+	if ctrl.dig and ctrl.sneak and shoots then
 
 		local pos = entity.object:get_pos()
 		local obj = minetest.add_entity({

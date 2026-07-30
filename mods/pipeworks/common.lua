@@ -211,7 +211,7 @@ function pipeworks.create_fake_player(def, is_dynamic)
 
 		-- Controls
 		get_player_control = delay({
-			jump=false, right=false, left=false, LMB=false, RMB=false,
+			jump=false, right=false, left=false, dig=false, place=false,
 			sneak=def.sneak, aux1=false, down=false, up=false
 		}),
 		get_player_control_bits = delay(def.sneak and 64 or 0),

@@ -164,9 +164,9 @@ function medical.injury_handle(player, clicker, rightclick, tool, hitlimb, finis
 			max_hear_distance = 16,
 		}, true)
 	end
-	local key = "LMB"
+	local key = "dig"
 	if rightclick then
-		key = "RMB"
+		key = "place"
 	end
 	if stepdef.time then
 		medical.start_timer(cname, stepdef.time, false, {player, clicker, rightclick, tool, hitlimb, true}, medical.injury_handle, stoparg, stopfunc, key, cname, name)

@@ -44,7 +44,7 @@ end)
 
 function character_anim.is_interacting(player)
 	local control = player:get_player_control()
-	return players_with_interact[player:get_player_name()] and (control.RMB or control.LMB)
+	return players_with_interact[player:get_player_name()] and (control.place or control.dig)
 end
 
 local function get_look_horizontal(player)

@@ -139,12 +139,12 @@ minetest.register_globalstep(function(dtime)
 					player_anim[name] = nil
 					player_sneak[name] = controls.sneak
 				end
-				if controls.LMB then
+				if controls.dig then
 					player_set_animation(player, "walk_mine", animation_speed_mod)
 				else
 					player_set_animation(player, "walk", animation_speed_mod)
 				end
-			elseif controls.LMB then
+			elseif controls.dig then
 				player_set_animation(player, "mine")
 			else
 				player_set_animation(player, "stand", animation_speed_mod)

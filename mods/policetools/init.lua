@@ -35,7 +35,7 @@ local function dospeed(player, name)
 		pitch = speed/60+.5,
 		gain = .1
 	})
-	if player:get_player_control().LMB then
+	if player:get_player_control().dig then
 		minetest.after(.2, dospeed, player, name)
 	else
 		minetest.chat_send_player(name, "Speed gun reads "..tostring(math.floor(speedgun[name]*2.237*10)*.1).." MPH")
@@ -264,7 +264,7 @@ if minetest.get_modpath("character_anim") and minetest.get_modpath("player_api")
 		if player
 			and player:get_wielded_item():get_name() == ""
 			and not disallowed_anims[player_api.get_animation(player).animation]
-			and not control.RMB and not control.LMB and not control.aux1
+			and not control.place and not control.dig and not control.aux1
 		then return true
 		else return false
 		end

@@ -85,7 +85,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 					player:hud_set_flags({wielditem=true})
 					--medical.feeling[cname] = nil
 				end
-			end, "RMB", cname, sname
+			end, "place", cname, sname
 		)
 	else
 		local temptex = "temp_normal.png"
@@ -135,7 +135,7 @@ medical.usedtools[""] = function(player, clicker, wielditem, hitloc, local_hitlo
 					player:hud_set_flags({wielditem=true})
 					--medical.feeling[cname] = nil
 				end
-			end, "RMB", cname, sname
+			end, "place", cname, sname
 		)
 	end
 	return true
@@ -217,7 +217,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 				})
 			end
 		end
-		medical.start_timer(cname, .25, true, player, func, stoparg, stopfunc, "LMB", cname)
+		medical.start_timer(cname, .25, true, player, func, stoparg, stopfunc, "dig", cname)
 		return
 	elseif hitpart == "breath" and distance <= .15 then
 		if medical.hud[cname] then
@@ -262,7 +262,7 @@ medical.attachedtools[""] = function(player, clicker, wielditem, hitloc, local_h
 				})
 			end
 		end
-		medical.start_timer(cname, .5, true, player, func, stoparg, stopfunc, "LMB", cname)
+		medical.start_timer(cname, .5, true, player, func, stoparg, stopfunc, "dig", cname)
 		return--]]
 	end
 	local all_objects = minetest.get_objects_inside_radius(hitloc, 10)
