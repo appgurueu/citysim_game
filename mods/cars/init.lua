@@ -1311,7 +1311,12 @@ local function car_step(self, dtime, moveresult)
 			self.wheel.frontright:set_attach(self.object, "", def.wheel.frontright, {x=0,y=self.wheelpos,z=0})
 			self.wheel.frontleft:set_attach(self.object, "", def.wheel.frontleft, {x=0,y=self.wheelpos,z=0})
 			
-			self.object:set_bone_position("steering", def.steeringwheel, {x=0,y=0,z=-self.wheelpos*8})
+			-- Rotation is radians here, unlike the set_attach call below which
+			-- takes degrees.
+			self.object:set_bone_override("steering", {
+				position = {vec = vector.copy(def.steeringwheel), absolute = true},
+				rotation = {vec = vector.new(0, 0, math.rad(-self.wheelpos*8)), absolute = true},
+			})
 		end
 		local carroll = 0
 		if node ~= "air" then

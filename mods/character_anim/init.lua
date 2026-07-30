@@ -82,23 +82,37 @@ local function nil_default(value, default)
 	return value
 end
 
+-- This mod works in degrees throughout; the engine's bone overrides take
+-- radians. Overrides are absolute, which is what set_bone_position did and
+-- what set_bone_override has to be told explicitly.
+local function apply_bone(obj, bonename, position, euler_rotation)
+	obj:set_bone_override(bonename, {
+		position = {vec = vector.copy(position), absolute = true},
+		rotation = {vec = vector.apply(euler_rotation, math.rad), absolute = true},
+	})
+end
+
 -- Forward declaration
 local handle_player_animations
 -- Raw PlayerRef methods
-local set_bone_position, set_animation, set_local_animation
+local patched, set_animation, set_local_animation
 minetest.register_on_joinplayer(function(player)
 	get_playerdata(player) -- Initalizes playerdata if it isn't already initialized
-	if not set_bone_position then
+	if not patched then
 		local PlayerRef = getmetatable(player)
+		patched = true
 
-		set_bone_position = PlayerRef.set_bone_position
+		-- Kept so third-party mods calling the deprecated method are still
+		-- tracked; it now forwards to the bone override API rather than to the
+		-- deprecated engine method.
 		function PlayerRef:set_bone_position(bonename, position, rotation)
+			bonename = bonename or ""
+			position = position or {x = 0, y = 0, z = 0}
+			rotation = rotation or {x = 0, y = 0, z = 0}
 			if self:is_player() then
-				character_anim.set_bone_override(self, bonename or "",
-					position or {x = 0, y = 0, z = 0},
-					rotation or {x = 0, y = 0, z = 0})
+				character_anim.set_bone_override(self, bonename, position, rotation)
 			end
-			return set_bone_position(self, bonename, position, rotation)
+			return apply_bone(self, bonename, position, rotation)
 		end
 
 		set_animation = PlayerRef.set_animation
@@ -347,7 +361,7 @@ function handle_player_animations(dtime, player)
 	for bone, values in pairs(bones) do
 		local overridden_values = player_animation.bone_positions[bone]
 		overridden_values = overridden_values or {}
-		set_bone_position(player, bone,
+		apply_bone(player, bone,
 			overridden_values.position or values.position,
 			overridden_values.euler_rotation or values.euler_rotation)
 	end
