@@ -151,6 +151,7 @@ Append one line per working session so the next session knows where it stopped.
 |---|---|---|
 | 2026-07-30 | — | `MODERNIZATION.md` written; no code changes yet. luacheck baseline recorded in §7.1. |
 | 2026-07-30 | §7.5 steps 1, 2 | `alpha_workaround_minus` submodule bumped `fc8f9df` → `a4f9749` (upstream HEAD). `.luacheckrc` `read_globals` extended: 3579 → 3341 warnings, W113 540 → 302, 0 errors (§7.1.1). The 302 survivors are now classified into a real bug queue (§7.1.1). |
+| 2026-07-30 | §7.6 | Upstream import protocol defined and `tools/verify-upstream-imports.sh` checked in (positive + both negative cases tested). No mod upgraded yet. Corrected `enable_shadows` upstream URL in §7.2.2. |
 
 ---
 
@@ -1270,7 +1271,7 @@ These are the upgrade candidates: upstream has already done much of the §2 migr
 | `basic_materials` | 1 | 1 · unverified | mt-mods/basic_materials (CDB) |  |
 | `bedrock2` | 1 | 1 · unverified | Wuzzy/bedrock2 (CDB) |  |
 | `builtin_item` | 1 | 1 · unverified | TenPlus1/builtin_item (CDB) |  |
-| `enable_shadows` | 1 | 1 · unverified | ROllerozxa/enable_shadows (CDB) |  |
+| `enable_shadows` | 1 | 1 · unverified | rollerozxa/**minetest-enable-shadows** | CDB pkg `enable_shadows`; repo name ≠ mod name |
 | `envelopes` | 1 | 1 · unverified | archfan7411/envelopes (CDB) |  |
 | `itemframes` | 1 | 1 · unverified | TenPlus1/itemframes (CDB) |  |
 | `letters` | 1 | 1 · unverified | Amaz/letters (CDB) |  |
@@ -1342,6 +1343,14 @@ Applies to **every** mod in 7.2.1 and 7.2.2, regardless of band:
    is exactly the information the commit metric cannot provide and the next session
    should not have to re-derive.
 
+**Commit it per §7.6**, which turns steps 2–5 into one verifiable fetch commit plus one
+commit per reapplied customization. Do not land an upgrade as a single lump commit.
+
+Note that a ContentDB *package* name is not the repo name: `enable_shadows` lives at
+`rollerozxa/minetest-enable-shadows`, and `mobs_redo` is CDB package `mobs` (§7.2.4).
+Resolve the real URL from the package API's `repo` field:
+`curl -sS https://content.luanti.org/api/packages/<author>/<name>/`
+
 To establish the MTG base version (§7.2.1), diff `mods/default` against `minetest_game`
 at tags 5.0.0 … 5.8.0 and take the best match; the MTG mods almost certainly all came
 from a single import.
@@ -1393,3 +1402,109 @@ Cheapest and most mechanical first, so the risky audits happen once the noise is
       Likely hits `playercontrol`, `controls`, `sprint`, `cars`.
 - [ ] 16. `mod.conf` for `mods/cooking` and `mods/cooking_fr` (the only two left, both
       submodules); delete their `depends.txt`.
+
+### 7.6 Upstream import protocol — how §7.3 gets committed
+
+§7.3 says *what* to do; this says how to land it so it can be reviewed remotely without
+reading thousands of lines of upstream churn. **Follow this for every mod upgrade.**
+
+#### Branch
+
+One branch per mod, pushed to the `fork` remote (`appgurueu/citysim_game`), matching convention `upgrade/<modname>`. One mod per
+branch means a bad upgrade is reverted without blocking the other eighteen.
+
+#### Commit 1 — the fetch. Verify it, do not read it.
+
+A **verbatim** import of the upstream tree: no local content, nothing outside the mod
+directory. Because git tree hashes are content-addressed, an equal hash across two
+unrelated repositories proves the content is identical — so this commit is checked by
+one hash comparison instead of by reading its diff.
+
+Message carries the trailers the verifier consumes, plus the **plan** for what follows:
+
+```
+<mod>: import upstream <short-sha>
+
+Verbatim import. Verify with tools/verify-upstream-imports.sh, do not read.
+
+Customizations to reapply:
+  1. <what>                        -> kept       (commit follows)
+  2. <what>                        -> dropped    (upstream does this since <sha>)
+  3. <what>                        -> adapted    (bone API changed in 5.9)
+
+Upstream-Repo: https://github.com/…
+Upstream-Commit: <40-hex>
+Upstream-Subpath: .
+Local-Path: mods/<mod>
+Anchor-Commit: <40-hex|none>
+Anchor-Method: exact-tree-match | best-diff-match | none
+```
+
+The message is not part of the tree, so a rich ledger here costs the verification nothing.
+**Dropped customizations exist only here** — they produce no commit of their own, so if they
+are not written down they vanish silently. They are also the highest-risk decision on the
+branch: dropping local work because "upstream does it now" is exactly what a reviewer needs
+to second-guess.
+
+Produce it with (no `git subtree` on this machine):
+
+```sh
+git fetch --no-tags <repo> HEAD && SHA=$(git rev-parse FETCH_HEAD)
+git rm -r -q --cached mods/<mod> && rm -rf mods/<mod>
+git read-tree --prefix=mods/<mod>/ -u "$SHA^{tree}"
+```
+
+Upstream's `.github/`, `.gitignore` and CI config come in too. That is deliberate: exact
+verification is worth a few deletion lines, and "we strip upstream's CI" genuinely is a
+local policy that should be visible rather than assumed.
+
+#### Commits 2..n — one per reapplied customization
+
+Not one lump. Each local change lands as its own commit, so each can be judged, reverted or
+questioned on its own, and the subject line says what the customization *is* rather than
+"reapply local changes". Order them so anything load-bearing comes first.
+
+**A mod with no commits after the fetch needed no judgment at all** — verify the hash and
+skip it. Review effort then scales with real divergence instead of with mod count, which is
+the entire point when a batch is nineteen mods wide.
+
+#### `Anchor-Method` — say how the customization list was derived
+
+To know what the local customizations *are* you need the version the game forked from.
+§7.3 step 3 concedes it often cannot be pinned. Search for it mechanically: diff the local
+tree against each upstream tag/commit candidate and take the smallest diff.
+
+| Value | Meaning | Reviewer should |
+|---|---|---|
+| `exact-tree-match` | local is pristine upstream at that commit | trust it; there are no customizations to review |
+| `best-diff-match` | anchor inferred; customizations computed as a real patch | review normally |
+| `none` | no anchor found — the list was assembled **by reading, not by patch application** | scrutinise hard |
+
+`none` is not a failure, it is a disclosure. It is also the machine-readable form of
+CLAUDE.md's rule that band 1 means *unverified*, not *unmodified*.
+
+#### Submodules
+
+`cooking`, `cooking_fr`, `alpha_workaround_minus`: the fetch is just the pointer bump, and
+it is already exactly verifiable — the gitlink *is* the upstream commit, which the verifier
+checks directly. Customizations cannot live in the parent repo; they need an upstream commit
+or a fork.
+
+#### Verifying
+
+```sh
+tools/verify-upstream-imports.sh              # all history
+tools/verify-upstream-imports.sh master..HEAD # just this branch
+```
+
+Checks every commit carrying an `Upstream-Commit:` trailer: that the tree at `Local-Path`
+is identical to upstream at that commit, and that the commit touches nothing else. Exits
+non-zero on any failure, so it can gate a PR. Upstream mirrors are cached under
+`${XDG_CACHE_HOME:-~/.cache}/citysim-upstream`.
+
+#### Agent-parallel notes
+
+Each agent owns one mod, one branch, and its own commits — no shared file, so nineteen can
+run at once. **Agents must not write `MODERNIZATION.md`**; §7.4 gets merged afterwards from
+the commit trailers, which is mechanical because they are structured. An agent that writes
+its own §7.4 row will clobber the other eighteen.
