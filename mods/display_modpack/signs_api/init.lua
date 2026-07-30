@@ -165,25 +165,6 @@ signs_api.on_rotate = function(pos, node, player, mode, new_param2)
 	return display_api.on_rotate(pos, node, player, mode, new_param2)
 end
 
--- Legacy mode with rotation restriction
--- TODO:When MT < 5.0 no more in use, to be removed
-if display_api.is_rotation_restricted() then
-	signs_api.on_rotate = function(pos, node, player, mode, new_param2)
-		-- If rotation mode is 2 and sign is directional, swap direction.
-		-- Otherwise use display_api's on_rotate function.
-		if mode == 2 then
-			local ndef = minetest.registered_nodes[node.name]
-			if ndef.signs_other_dir then
-				minetest.swap_node(pos, {name = ndef.signs_other_dir,
-					param1 = node.param1, param2 = node.param2})
-				display_api.update_entities(pos)
-				return true
-			end
-		end
-		return display_api.on_rotate(pos, node, player, mode, new_param2)
-	end
-end
-
 function signs_api.register_sign(mod, name, model)
 	-- Default fields
 	local fields = {

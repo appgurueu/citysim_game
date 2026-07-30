@@ -79,22 +79,8 @@ for i, r in pairs(wallmounted_rotations) do
 end
 
 -- Detect rotation restriction
-local rotation_restricted = nil
-minetest.register_entity('display_api:dummy_entity', {
-	collisionbox = { 0, 0, 0, 0, 0, 0 },
-	visual = "upright_sprite",
-	textures = {} })
-
 function display_api.is_rotation_restricted()
-	if rotation_restricted == nil then
-		local objref = minetest.add_entity(
-			{x=0, y=0, z=0}, 'display_api:dummy_entity')
-		if objref then
-			rotation_restricted = objref.set_rotation == nil
-			objref:remove()
-		end
-	end
-	return rotation_restricted
+	return false
 end
 
 -- Clip position property to maximum entity position
