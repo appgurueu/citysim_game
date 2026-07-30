@@ -2,12 +2,14 @@ local gunitems = {}
 local invsize = minetest.settings:get("invsize") or 32
 
 minetest.register_entity("spriteguns:gunitem",{
-	hp_max = 1,
-	visual="wielditem",
-	visual_size={x=.4,y=.4},
-	collisionbox = {0,0,0,0,0,0},
-	physical=false,
-	textures={"air"},
+	initial_properties = {
+		hp_max = 1,
+		visual="wielditem",
+		visual_size={x=.4,y=.4},
+		collisionbox = {0,0,0,0,0,0},
+		physical=false,
+		textures={"air"},
+	},
 	on_activate = function(self, staticdata)
 		if not staticdata or staticdata == "" then self.object:remove() return end
 		local data = minetest.deserialize(staticdata)

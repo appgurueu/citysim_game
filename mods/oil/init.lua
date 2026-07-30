@@ -322,20 +322,20 @@ oil.stopfuel = function(name)
 end
 
 minetest.register_entity("oil:line", {
-    hp_max = 1,
-    physical = false,
-	pointable = false,
-    weight = 5,
-    collisionbox = {-0.1,-0.1,-0.1, 0.1,0.1,0.1},
-    visual = "cube",
-    visual_size = {x=.05, y=.1},
-    textures = {"blackline.png", "blackline.png", "blackline.png", "blackline.png", "blackline.png", "blackline.png"}, -- number of required textures depends on visual
-    colors = {}, -- number of required colors depends on visual
-    spritediv = {x=1, y=1},
-    initial_sprite_basepos = {x=0, y=0},
-    is_visible = true,
-    makes_footstep_sound = false,
-    automatic_rotate = 0,
+    initial_properties = {
+        hp_max = 1,
+        physical = false,
+        pointable = false,
+        collisionbox = {-0.1,-0.1,-0.1, 0.1,0.1,0.1},
+        visual = "cube",
+        visual_size = {x=.05, y=.1},
+        textures = {"blackline.png", "blackline.png", "blackline.png", "blackline.png", "blackline.png", "blackline.png"}, -- number of required textures depends on visual
+        spritediv = {x=1, y=1},
+        initial_sprite_basepos = {x=0, y=0},
+        is_visible = true,
+        makes_footstep_sound = false,
+        automatic_rotate = 0,
+    },
 	on_step = function(self, dtime)
 		if self.startobj then
 			self.start = self.startobj:get_pos()

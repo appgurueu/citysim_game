@@ -230,11 +230,13 @@ end
 
 -- throwable hoe bomb
 minetest.register_entity("farming:hoebomb_entity", {
-	physical = true,
-	visual = "sprite",
-	visual_size = {x = 1.0, y = 1.0},
-	textures = {"farming_hoe_bomb.png"},
-	collisionbox = {0,0,0,0,0,0},
+	initial_properties = {
+		physical = true,
+		visual = "sprite",
+		visual_size = {x = 1.0, y = 1.0},
+		textures = {"farming_hoe_bomb.png"},
+		collisionbox = {0,0,0,0,0,0},
+	},
 	lastpos = {},
 	player = "",
 

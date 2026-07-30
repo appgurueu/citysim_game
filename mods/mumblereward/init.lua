@@ -9,11 +9,13 @@ local mumbleonly = minetest.settings:get_bool("mumbleonly") or false
 
 local mutetags = {}
 minetest.register_entity("mumblereward:tag", {
-	physical = false,
-	collisionbox = {x=0, y=0, z=0},
-	visual = "sprite",
-	textures = {"nomumble.png"},
-	visual_size = {x=.3, y=.3, z=.3},
+	initial_properties = {
+		physical = false,
+		collisionbox = {x=0, y=0, z=0},
+		visual = "sprite",
+		textures = {"nomumble.png"},
+		visual_size = {x=.3, y=.3, z=.3},
+	},
 	on_activate = function(self, staticdata, dtime_s)
 		minetest.after(.1, function()
 			if self and (not self.owner or not minetest.get_player_by_name(self.owner)) then self.object:remove() end

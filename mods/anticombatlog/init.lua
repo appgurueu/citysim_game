@@ -80,16 +80,17 @@ local function remove_body(self)
 end
 
 minetest.register_entity("anticombatlog:entity", {
-	hp_max = 20,
-	physical = true,
-	weight = 5,
-	collisionbox = {-0.3, 0, -0.3, 0.3, .3, 0.3},
-	visual = "mesh",
-	mesh = "character.b3d",
-	textures = {"invisible.png"},
-	is_visible = true,
-	makes_footstep_sound = false,
-    automatic_rotate = 0,
+	initial_properties = {
+		hp_max = 20,
+		physical = true,
+		collisionbox = {-0.3, 0, -0.3, 0.3, .3, 0.3},
+		visual = "mesh",
+		mesh = "character.b3d",
+		textures = {"invisible.png"},
+		is_visible = true,
+		makes_footstep_sound = false,
+		automatic_rotate = 0,
+	},
     on_activate = function(self, staticdata, dtime_s)
 		local deserialized = minetest.deserialize(staticdata)
 		if not deserialized then

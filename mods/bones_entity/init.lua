@@ -42,16 +42,17 @@ end
 local boneid = 0--goes up every time a bone is activated, reboot to reset. used for seperating bone inventories from the same player from each other
 
 minetest.register_entity("bones_entity:entity", {
-	hp_max = 1,
-	physical = true,
-	weight = 5,
-	collisionbox = {-0.3, -.01, -0.3, 0.3, .2, 0.3},
-	visual = "mesh",
-	mesh = "character.b3d",
-	textures = {"invisible.png"},
-	is_visible = true,
-	makes_footstep_sound = false,
-    automatic_rotate = false,
+	initial_properties = {
+		hp_max = 1,
+		physical = true,
+		collisionbox = {-0.3, -.01, -0.3, 0.3, .2, 0.3},
+		visual = "mesh",
+		mesh = "character.b3d",
+		textures = {"invisible.png"},
+		is_visible = true,
+		makes_footstep_sound = false,
+		automatic_rotate = false,
+	},
     on_activate = function(self, staticdata, dtime_s)
 		if not self.owner then
 			local deserialized = minetest.deserialize(staticdata)

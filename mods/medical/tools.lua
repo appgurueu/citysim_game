@@ -318,16 +318,18 @@ medical.attachedtools["medical:blanket"] = function(player, clicker, wielditem, 
 end
 
 minetest.register_entity("medical:blanket", {
-    hp_max = 1,
-    physical = false,
-	pointable = true,
+    initial_properties = {
+        hp_max = 1,
+        physical = false,
+        pointable = true,
+        collisionbox = {-0.4,.2,-0.4, 0.4,0.4,0.4},
+        visual = "mesh",
+        mesh = "blanket-laying.b3d",
+        textures = {"wool_white.png"},
+        is_visible = true,
+        makes_footstep_sound = false,
+    },
 	--use_texture_alpha = false,
-    collisionbox = {-0.4,.2,-0.4, 0.4,0.4,0.4},
-    visual = "mesh",
-	mesh = "blanket-laying.b3d",
-    textures = {"wool_white.png"},
-    is_visible = true,
-    makes_footstep_sound = false,
 	on_activate = function(self, staticdata, dtime_s)
 		if not staticdata or staticdata == "" then self.object:remove() return end
 		self.object:set_armor_groups({fleshy = 0})

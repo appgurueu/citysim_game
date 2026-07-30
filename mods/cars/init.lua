@@ -307,13 +307,14 @@ local function remove_towline(car)
 end
 
 minetest.register_entity("cars:towline", {
-    hp_max = 1,
-    physical = false,
-	pointable = false,
-    weight = 5,
-    visual = "cube",
-    visual_size = {x=.1, y=.1},
-    textures = {"towline.png", "towline.png", "towline.png", "towline.png", "towline.png", "towline.png"}, 
+    initial_properties = {
+        hp_max = 1,
+        physical = false,
+        pointable = false,
+        visual = "cube",
+        visual_size = {x=.1, y=.1},
+        textures = {"towline.png", "towline.png", "towline.png", "towline.png", "towline.png", "towline.png"},
+    },
 	on_step = function(self, dtime)
 		--self.los_timer = (self.los_timer or 0) + dtime
 		if dtime > .2 then dtime = .2 end
@@ -671,18 +672,19 @@ end
 
 local function register_lightentity(carname)
 	minetest.register_entity("cars:"..carname.."lights",{
-		hp_max = 1,
-		physical = false,
-		pointable = false,
-		collide_with_objects = false,
-		weight = 5,
-		collisionbox = {-0.2,-0.2,-0.2, 0.2,0.2,0.2},
-		visual = "mesh",
-		visual_size = {x=1, y=1},
-		is_visible = true,
-		glow = 7,
-		mesh = carname.."lights.b3d",
-		textures = {"invisible.png"},
+		initial_properties = {
+			hp_max = 1,
+			physical = false,
+			pointable = false,
+			collide_with_objects = false,
+			collisionbox = {-0.2,-0.2,-0.2, 0.2,0.2,0.2},
+			visual = "mesh",
+			visual_size = {x=1, y=1},
+			is_visible = true,
+			glow = 7,
+			mesh = carname.."lights.b3d",
+			textures = {"invisible.png"},
+		},
 		on_activate = function(self, staticdata, dtime_s)
 			minetest.after(.1, function()
 				if not self.object:get_attach() then

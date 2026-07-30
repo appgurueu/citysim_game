@@ -7,13 +7,15 @@ local function reg_ball(color)
 	local ball_ent_name = "soccer:ball_"..color.."_entity"
 
 	minetest.register_entity(ball_ent_name, {
-		physical = true,
-		visual = "mesh",
-		mesh = "soccer_ball.x",
-		hp_max = 1000,
+		initial_properties = {
+			physical = true,
+			visual = "mesh",
+			mesh = "soccer_ball.x",
+			hp_max = 1000,
+			textures = { "soccer_ball_"..color..".png" },
+			collisionbox = { -0.2, -0.2, -0.2, 0.2, 0.2, 0.2 },
+		},
 		groups = { immortal = true },
-		textures = { "soccer_ball_"..color..".png" },
-		collisionbox = { -0.2, -0.2, -0.2, 0.2, 0.2, 0.2 },
 
 		timer = 0,
 

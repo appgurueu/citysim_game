@@ -279,17 +279,19 @@ end, true)
 
 
 minetest.register_entity("medical:puddle_blood", {
-    hp_max = 1,
-    physical = true,
-	collide_with_objects = false,
-	pointable = false,
-	use_texture_alpha = true,
-    collisionbox = {-0.1,-0.01,-0.1, 0.1,0.1,0.1},
-    visual = "mesh",
-	mesh = "plane.b3d",
-    textures = {"puddle_blood.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
-    is_visible = true,
-    makes_footstep_sound = false,
+    initial_properties = {
+        hp_max = 1,
+        physical = true,
+        collide_with_objects = false,
+        pointable = false,
+        use_texture_alpha = true,
+        collisionbox = {-0.1,-0.01,-0.1, 0.1,0.1,0.1},
+        visual = "mesh",
+        mesh = "plane.b3d",
+        textures = {"puddle_blood.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
+        is_visible = true,
+        makes_footstep_sound = false,
+    },
 	on_activate = function(self, staticdata, dtime_s)
 		staticdata = minetest.deserialize(staticdata)
 		if not staticdata then return end
@@ -326,17 +328,19 @@ minetest.register_entity("medical:puddle_blood", {
 	end
 })
 minetest.register_entity("medical:puddle_water", {
-    hp_max = 1,
-    physical = true,
-	collide_with_objects = false,
-	pointable = false,
-	use_texture_alpha = true,
-    collisionbox = {-0.1,-0.02,-0.1, 0.1,0.1,0.1},
-    visual = "mesh",
-	mesh = "plane.b3d",
-    textures = {"puddle_water.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
-    is_visible = true,
-    makes_footstep_sound = false,
+    initial_properties = {
+        hp_max = 1,
+        physical = true,
+        collide_with_objects = false,
+        pointable = false,
+        use_texture_alpha = true,
+        collisionbox = {-0.1,-0.02,-0.1, 0.1,0.1,0.1},
+        visual = "mesh",
+        mesh = "plane.b3d",
+        textures = {"puddle_water.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
+        is_visible = true,
+        makes_footstep_sound = false,
+    },
 	on_activate = function(self, staticdata, dtime_s)
 		staticdata = minetest.deserialize(staticdata)
 		if not staticdata then return end
@@ -366,17 +370,19 @@ minetest.register_entity("medical:puddle_water", {
 })
 
 minetest.register_entity("medical:unconsciousattach", {
-    hp_max = 1,
-    physical = true,
-	collide_with_objects = false,
-	pointable = false,--this should be false after testing
-	use_texture_alpha = true,
-    collisionbox = {-0.2,0,-0.2, 0.2,0.4,0.2},
-    visual = "sprite",
-	textures = {"invis.png"},
+    initial_properties = {
+        hp_max = 1,
+        physical = true,
+        collide_with_objects = false,
+        pointable = false,--this should be false after testing
+        use_texture_alpha = true,
+        collisionbox = {-0.2,0,-0.2, 0.2,0.4,0.2},
+        visual = "sprite",
+        textures = {"invis.png"},
+        is_visible = true,
+        makes_footstep_sound = false,
+    },
 	--textures = {"default_dirt.png"},
-    is_visible = true,
-    makes_footstep_sound = false,
 	on_activate = function(self, staticdata, dtime_s)
 		if not staticdata or staticdata == "" then self.object:remove() return end
 		self.object:set_acceleration({x=0, y=-10, z=0})

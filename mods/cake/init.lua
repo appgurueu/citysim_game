@@ -107,11 +107,13 @@ minetest.register_craft({
 -- THROWABLE CAKE --
 
 minetest.register_entity("cake:cake_entity", {
-	physical = false,
+	initial_properties = {
+		physical = false,
+		textures = {"cake.png"},
+		collisionbox = {0,0,0,0,0,0},
+	},
 	timer = 0,
-	textures = {"cake.png"},
 	lastpos = {},
-	collisionbox = {0,0,0,0,0,0},
 	on_step = function(self, dtime)
 		self.timer=self.timer+dtime
 		local pos = self.object:get_pos()

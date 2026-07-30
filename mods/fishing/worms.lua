@@ -37,12 +37,14 @@ minetest.register_craftitem("fishing:bait_worm", {
 -- WORM MOB
 -----------------------------------------------------------------------------------------------
 minetest.register_entity("fishing:bait_worm_entity", {
-	hp_max = 300,
+	initial_properties = {
+		hp_max = 300,
+		collisionbox = {-3/16, -3/16, -3/16, 3/16, 3/16, 3/16},
+		visual = "sprite",
+		visual_size = {x=1/2, y=1/2},
+		textures = { "fishing_bait_worm.png", "fishing_bait_worm.png"},
+	},
 	damage_over_time = 1,
-	collisionbox = {-3/16, -3/16, -3/16, 3/16, 3/16, 3/16},
-	visual = "sprite",
-	visual_size = {x=1/2, y=1/2},
-	textures = { "fishing_bait_worm.png", "fishing_bait_worm.png"},
 	view_range = 32,
 	-- Don't punch this poor creature...
 	on_punch = function(self, puncher)

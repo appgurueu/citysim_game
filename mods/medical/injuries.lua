@@ -177,17 +177,18 @@ function medical.injury_handle(player, clicker, rightclick, tool, hitlimb, finis
 end
 
 minetest.register_entity("medical:injury", {
-    hp_max = 1,
-    physical = false,
-	pointable = false,
-    weight = 5,
-	use_texture_alpha = true,
-    collisionbox = {-0.1,-0.1,-0.1, 0.1,0.1,0.1},
-    visual = "mesh",
-	mesh = "flat.b3d",
-    textures = {"invis.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
-    is_visible = true,
-    makes_footstep_sound = false,
+    initial_properties = {
+        hp_max = 1,
+        physical = false,
+        pointable = false,
+        use_texture_alpha = true,
+        collisionbox = {-0.1,-0.1,-0.1, 0.1,0.1,0.1},
+        visual = "mesh",
+        mesh = "flat.b3d",
+        textures = {"invis.png"}, -- number of required textures depends on visual -- number of required textures depends on visual
+        is_visible = true,
+        makes_footstep_sound = false,
+    },
 	on_activate = function(self, staticdata, dtime_s)
 		if not staticdata or staticdata == "" then self.object:remove() return end
 		local data = minetest.deserialize(staticdata)

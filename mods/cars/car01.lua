@@ -37,7 +37,6 @@ for id, color in pairs (carlist) do
 			hp_max = 1,
 			physical = true,
 			stepheight = 1.1,
-			weight = 5,
 			collisionbox = {-0.6, -0.05, -0.6, 0.6, 1.1, 0.6},
 			visual = "mesh",
 			visual_size = {x=1, y=1},
