@@ -1080,7 +1080,7 @@ local function car_step(self, dtime, moveresult)
 					if default.player_attached[name] then
 						dmg = dmg*.5
 					else
-						obj:add_player_velocity(self.lastv)
+						obj:add_velocity(self.lastv)
 					end
 					obj:punch(puncher, nil, {damage_groups={fleshy=dmg}})
 					::next::
@@ -1483,7 +1483,7 @@ local function car_step(self, dtime, moveresult)
 				if drillnode.name ~= "air" then
 					local posstring = minetest.pos_to_string(pos, 0)
 					if not drilledblocks[posstring] or drilledblocks[posstring].name ~= drillnode.name then
-						local health = minetest.get_node_group(drillnode.name, "strong")
+						local health = minetest.get_item_group(drillnode.name, "strong")
 						if health == 0 then health = 3 end--default 3 seconds to destroy non strong node
 						drilledblocks[posstring] = {name = drillnode.name, health = health}
 						

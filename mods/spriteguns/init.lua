@@ -418,7 +418,8 @@ local function fire(player, def, itemstack)
 				end
 			end
 			endPoint = point
-			if target:is_player() or (target:get_entity_name() and shootable_entities[target:get_entity_name()]) then
+			local targetent = target:get_luaentity()
+			if target:is_player() or (targetent and shootable_entities[targetent.name]) then
 				local targetpos = target:get_pos()
 				-- Add 50% damage if headshot
 				if point.y > targetpos.y + 1.5 then
@@ -638,7 +639,7 @@ minetest.register_globalstep(function(dtime)
 			tbl.anim = "reload"
 		end
 		loadtbl[name] = nil
-		local speed = vector.length(player:get_player_velocity())
+		local speed = vector.length(player:get_velocity())
 		if speed > max_speed then speed = max_speed end
 		local f = speed*.3
 		if tbl.f and f ~= tbl.f and f ~= 0 then

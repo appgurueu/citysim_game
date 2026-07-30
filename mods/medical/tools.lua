@@ -405,7 +405,7 @@ minetest.register_entity("medical:line", {
 		local player = minetest.get_player_by_name(self.owner)
 		local op = player:get_pos()
 		op.y = op.y + 1
-		op = vector.add(op, vector.multiply(player:get_player_velocity(), .1))
+		op = vector.add(op, vector.multiply(player:get_velocity(), .1))
 		if self.lastpos and vector.equals(self.lastpos, op) then return end
 		local tp = self.target
 		

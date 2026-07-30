@@ -520,7 +520,8 @@ minetest.register_node("oil:pump", {
 
 		local ent = data.obj:get_luaentity()
 		if not ent or not ent.finishobj then return end
-		local def = cars_registered_cars[ent.finishobj:get_entity_name()]
+		local finishent = ent.finishobj:get_luaentity()
+		local def = finishent and cars_registered_cars[finishent.name]
 		if not def then return end
 		local carent = ent.finishobj:get_luaentity()
 

@@ -14,7 +14,7 @@ local function getspeed(player)
 		local target = pointed.ref
 		local v = target:get_velocity() or {x=0,y=0,z=0}
 		if target:is_player() then
-			v = target:get_player_velocity() or {x=0,y=0,z=0}
+			v = target:get_velocity() or {x=0,y=0,z=0}
 		end
 		return vector.length(v)
 	end

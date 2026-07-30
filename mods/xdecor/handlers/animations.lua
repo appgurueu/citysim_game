@@ -7,7 +7,7 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 	if not top_face(pointed_thing) then return end
 	local player_name = clicker:get_player_name()
 	local objs = minetest.get_objects_inside_radius(pos, 0.1)
-	local vel = clicker:get_player_velocity()
+	local vel = clicker:get_velocity()
 	local ctrl = clicker:get_player_control()
 
 	for _, obj in pairs(objs) do

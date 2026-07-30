@@ -14,7 +14,7 @@ minetest.register_globalstep(function(dtime)
 				local pos2 = player2:get_pos()
 				local dist = vector.distance(pos1, pos2)
 				if dist < .6 then
-					player:add_player_velocity(vector.multiply(vector.direction(pos2, pos1), 1))
+					player:add_velocity(vector.multiply(vector.direction(pos2, pos1), 1))
 				end
 				::skip::
 			end

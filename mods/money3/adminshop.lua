@@ -103,7 +103,8 @@ minetest.register_node("money3:admin_shop", {
 			else
 				local car_near = false
 				for id, obj in pairs(minetest.get_objects_inside_radius(pos, 4)) do
-					if not obj:is_player() and car_list[obj:get_entity_name()] then
+					local objent = obj:get_luaentity()
+					if objent and car_list[objent.name] then
 						car_near = true
 						break
 					end
