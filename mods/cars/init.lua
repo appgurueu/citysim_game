@@ -1675,7 +1675,6 @@ function car_rightclick(self, clicker, closeid)
 				 offset        = {x = 0,   y = 0},
 				 text          = tostring(math.abs(math.floor(self.v*2.23694*10)/10)).." MPH",
 				 alignment     = {x = 0, y = 0},  -- center aligned
-				 scale         = {x = 100, y = 100}, -- covered later
 				 number    = 0xFFFFFF,
 			})
 		end

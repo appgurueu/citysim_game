@@ -161,7 +161,6 @@ local function do_HSL_formspec(player, name, fields)
 		else
 			hudpreview[name] = player:hud_add({
 				type = "text",
-				scale = {x=-100, y=-100},
 				text = "███████████",
 				number = "0x"..previewcolor[name],
 				position = { x = .5, y = 1 },

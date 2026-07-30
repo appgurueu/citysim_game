@@ -199,7 +199,6 @@ function vote.update_hud(player)
 		vote.hud:add(player, "vote:desc", {
 			type = "text",
 			position = {x = 1, y = 0.5},
-			scale = {x = 100, y = 100},
 			alignment = {x=-1,y=0},
 			text = voteset.description .. "?",
 			offset = {x=-8, y = 0},
@@ -214,7 +213,6 @@ function vote.update_hud(player)
 			vote.hud:add(player, "vote:help", {
 				type = "text",
 				position = {x = 1, y = 0.5},
-				scale = {x = 100, y = 100},
 				text = voteset.help,
 				offset = {x=-100, y = 20},
 				number = 0xFFFFFF

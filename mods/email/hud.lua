@@ -22,7 +22,6 @@ function email.update_hud(player)
 				name = "MailText",
 				position = {x=0.55, y=0.52},
 				text= #inbox .. " /inbox",
-				scale = {x=1,y=1},
 				alignment = {x=0.5, y=0.5},
 			})
 		end

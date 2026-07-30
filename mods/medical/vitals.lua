@@ -12,7 +12,6 @@ local function start_unconscious(player)
 				 offset        = {x = 0,   y = 0},
 				 text          = tostring(medical.data[name].hp or "nil").." hp",
 				 alignment     = {x = 0, y = 0},
-				 scale         = {x = 100, y = 100},
 				 number    = 0xFFFFFF,
 			})
 		end
@@ -252,7 +251,6 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 					 offset        = {x = 0,   y = 0},
 					 text          = tostring(medical.data[name].hp or "nil").." hp",
 					 alignment     = {x = 0, y = 0},
-					 scale         = {x = 100, y = 100},
 					 number    = 0xFFFFFF,
 				})
 			end
