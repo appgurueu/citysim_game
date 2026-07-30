@@ -138,7 +138,7 @@ timerfunctions["refer"] = function(name)
 		minetest.log("warning", "playercontrol: failed to complete refer of "..name)
 	end
 	if not privs.refer then return end
-	privs.refer = false
+	privs.refer = nil
 	minetest.set_player_privs(name, privs)
 end
 timerfunctions["lockpick"] = function(name)

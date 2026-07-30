@@ -160,7 +160,7 @@ minetest.register_chatcommand("setspeed", {
 			return
 		end
 
-		player:set_physics_override(tonumber(speed), nil, nil)
+		player:set_physics_override({speed = tonumber(speed)})
 	end,
 })
 
@@ -181,7 +181,7 @@ minetest.register_chatcommand("setgravity", {
 			minetest.chat_send_player(name, "This is not a number.")
 			return
 		end
-		player:set_physics_override(nil, tonumber(gravity), nil)
+		player:set_physics_override({gravity = tonumber(gravity)})
 	end,
 })
 
@@ -202,7 +202,7 @@ minetest.register_chatcommand("setjump", {
 			minetest.chat_send_player(name, "This is not a number.")
 			return
 		end
-		player:set_physics_override(nil, nil, jump_height)
+		player:set_physics_override({jump = tonumber(jump_height)})
 	end,
 })
 --[[
