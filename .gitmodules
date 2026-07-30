@@ -7,3 +7,9 @@
 [submodule "mods/alpha_workaround_minus"]
 	path = mods/alpha_workaround_minus
 	url = https://codeberg.org/appgurueu/alpha_workaround_minus.git
+[submodule "mods/modlib"]
+	path = mods/modlib
+	url = https://github.com/appgurueu/modlib
+[submodule "mods/cmdlib"]
+	path = mods/cmdlib
+	url = https://github.com/appgurueu/cmdlib
