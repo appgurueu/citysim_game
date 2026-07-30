@@ -82,20 +82,35 @@ not applicable.
 
 ### 1.1 Hard breakage — must fix
 
-- [ ] **[BREAK]** Writing anything into a mod directory — mod dirs are read-only since
+- [x] **[BREAK]** Writing anything into a mod directory — mod dirs are read-only since
       5.9, and writes are *disallowed* since 5.16. → `core.get_mod_data_path()` / world path. ([5.9](#59), [5.16](#516))
+      — audited 2026-07-30: every `io.open` against a `get_modpath()` path is read-mode;
+      the only three write-mode ones (`midi` ×2, `streets`) are inside comment blocks.
+      `wiki` writes, but under `get_worldpath()`, which is allowed. Boot is clean.
 - [ ] **[BREAK]** Vectors with `nil` components passed to engine functions error since 5.13. ([5.13](#513))
+      — not audited. Note `vector.copy` asserts on nil components, so the two call sites
+      converted in `cars` and `character_anim` now fail loudly rather than silently.
 - [n/a] **[BREAK]** `.bmp` textures stop working on clients ≥ 5.11. ([5.11](#511))
       — zero `.bmp` files in the tree (measured 2026-07-30, §7.1.2).
 - [ ] **[BREAK]** Re-using one table for two `register_node`/`register_craftitem`/`register_tool`
       calls — the table is modified; stricter checks since 5.12. ([5.12](#512))
-- [ ] **[BREAK]** `liquid_alternative_source` / `liquid_alternative_flowing` are mandatory
+      — not audited by grep, but a violation is a registration error and the boot is
+      clean, so any survivor is on a path not reached at load time.
+- [x] **[BREAK]** `liquid_alternative_source` / `liquid_alternative_flowing` are mandatory
       for liquids and `flowingliquid` drawtypes. ([5.7](#57), [5.9](#59))
-- [ ] **[BREAK]** `core.registered_schematics` was removed. ([5.9](#59))
-- [ ] **[BREAK]** Object property `weight` removed. ([5.2](#52))
-- [ ] **[BREAK]** `minetest.item_place_node` / `item_place` second return value changed from
-      `success` to `position`. ([5.2](#52))
-- [ ] **[BREAK]** `dump(obj, dumped)`'s second parameter changed meaning to `indent`. ([5.12](#512))
+      — verified 2026-07-30 by the log-driven pass: missing values are a hard
+      registration error since 5.12, 13 `liquidtype` nodes across 4 mods all register
+      without error.
+- [n/a] **[BREAK]** `core.registered_schematics` was removed. ([5.9](#59)) — zero hits.
+- [x] **[BREAK]** Object property `weight` removed. ([5.2](#52))
+      — removed from `anticombatlog`, `bones_entity`, `cars` (6 sites), `medical`, `oil`.
+      Every surviving `weight =` is a false positive: `gas_lib`'s own buoyancy field
+      (and `oil`'s use of it), a local in `policetools`, and commented-out defs.
+      This resolves the §7.1.2 caveat — the 22 raw hits were indeed mostly noise.
+- [n/a] **[BREAK]** `minetest.item_place_node` / `item_place` second return value changed from
+      `success` to `position`. ([5.2](#52)) — zero sites capture the second return value.
+- [n/a] **[BREAK]** `dump(obj, dumped)`'s second parameter changed meaning to `indent`. ([5.12](#512))
+      — zero hits; the one grep match is `modlib`'s unrelated `assertdump`.
 
 ### 1.2 Runtime deprecation warnings — visible in `debug.txt`
 
@@ -103,10 +118,23 @@ These are the ones the log-driven sweep (§0.1) will hand you directly.
 
 - [x] **[WARN]** `player:get_attribute` / `set_attribute` → `player:get_meta()`. ([5.0](#legacy))
       — zero call sites remain (measured 2026-07-30, §7.1.2); finished by `0cf5fa2a`.
-- [ ] **[WARN]** `obj:set_bone_position` / `get_bone_position` → `set_bone_override` / `get_bone_override`. ([5.9](#59))
-- [ ] **[WARN]** `use_texture_alpha = true/false` → `"opaque"` / `"clip"` / `"blend"`. ([5.4](#54))
+- [x] **[WARN]** `obj:set_bone_position` / `get_bone_position` → `set_bone_override` / `get_bone_override`. ([5.9](#59))
+      — `cars` (steering bone) and `character_anim` migrated 2026-07-30. `frisk`'s call is
+      commented out; `pipeworks` has a stub in its fake player. `character_anim` keeps its
+      monkeypatch of `PlayerRef.set_bone_position` on purpose — that shim exists to track
+      *third-party* callers of the deprecated method — but it now forwards to
+      `set_bone_override`. **Not verified visually**; see §7.4.
+- [~] **[WARN]** `use_texture_alpha = true/false` → `"opaque"` / `"clip"` / `"blend"`. ([5.4](#54))
+      — **the only real hits in the whole tree are 7 nodes in the `cooking` submodule**
+      (`init.lua` potdef, `ovenstove.lua`); both are `drawtype = "mesh"`, so the correct
+      value is `"blend"` (`true` maps to `"clip"` only for `drawtype = "normal"`).
+      Blocked: a submodule cannot carry a parent-repo customization (§7.6).
+      The 4 `medical` hits are **false positives** — they are `register_entity`, where
+      `use_texture_alpha` is a plain boolean object property and is *not* deprecated.
 - [x] **[WARN]** TileDef `image = ...` → `name = ...`. — done in commit `09cecc8d`
-- [ ] **[WARN]** Entity properties in the bare definition table → `initial_properties`. ([5.8](#58))
+- [~] **[WARN]** Entity properties in the bare definition table → `initial_properties`. ([5.8](#58))
+      — 23 of 27 definitions migrated 2026-07-30 (180 properties, 18 mods). Remaining:
+      `mobs_redo` (3 defs) and `3d_armor_stand` (1), both deferred with reasons in §7.4.
 - [~] **[WARN]** `core.get_connected_players()` at load time. — one instance fixed in
       commit `ee1815e1`; not yet swept across all mods. ([warnings](#5-runtime-warning--fix-table))
 - [~] **[WARN]** Missing `mod.conf` with a `name`; `depends.txt` / `description.txt`. —
@@ -115,14 +143,21 @@ These are the ones the log-driven sweep (§0.1) will hand you directly.
       `depends.txt`); zero `description.txt` remain. ([5.5](#55), [5.6](#56), §7.1)
 - [n/a] **[WARN]** `hud_elem_type` → `type` in HUD definitions. ([5.9](#59))
       — zero hits (measured 2026-07-30, §7.1.2).
-- [ ] **[WARN]** craftitem/tool `image` → `inventory_image`; tool caps directly in def → `tool_capabilities`;
+- [~] **[WARN]** craftitem/tool `image` → `inventory_image`; tool caps directly in def → `tool_capabilities`;
       `cookresult_itemstring` / `furnace_burntime` → `core.register_craft`. ([legacy](#legacy))
-- [~] **[WARN]** `core.env:foo()`, `core.setting_*`, `core.register_on_auth_fail`,
+      — `cookresult_itemstring` and `furnace_burntime` are **zero**. The `image` and
+      loose-tool-caps halves are unmeasured, but neither fired during the log-driven
+      pass, which exercises every `register_*` call.
+- [x] **[WARN]** `core.env:foo()`, `core.setting_*`, `core.register_on_auth_fail`,
       `core.register_async_metatable`, `core.get_node_group`. ([legacy](#legacy), [5.3](#53), [5.9](#59))
-      — measured 2026-07-30 (§7.1.2): `core.env` **59 hits / 14 files** (mostly `beer_test`),
-      `get_node_group` **1**. The other three are **zero** and need no work.
-- [ ] **[WARN]** `core.set_player_privs(name, {priv = false})` — pass only `true` values,
+      — all now **zero**. `core.env` (59 hits / 14 files) and `get_node_group` (1) swept
+      2026-07-30; the other three were never present. The dead, never-`dofile`d
+      `beer_test/mod_files/--plants.lua` was converted too, so the count is honestly zero.
+- [x] **[WARN]** `core.set_player_privs(name, {priv = false})` — pass only `true` values,
       or use `core.change_player_privs`. ([5.9](#59))
+      — the "28 hits / 10 files" in §7.1.2 counted *call sites*, not violations. Exactly
+      **one** site passed a `false` value (`playercontrol`, `privs.refer = false`); all 19
+      other revocations already used `nil`, which removes the key and never warns.
 
 ### 1.3 Silent behaviour changes — the dangerous ones
 
@@ -130,8 +165,12 @@ No warning will ever fire for these. Each needs a deliberate audit, and each sho
 a note recording *how* it was verified, because "no diff" and "not looked at" are
 indistinguishable otherwise.
 
-- [ ] **[SILENT]** `paramtype2 = "degrotate"` rotation step changed 2° → 1.5°, range 0–179 → 0–239.
+- [n/a] **[SILENT]** `paramtype2 = "degrotate"` rotation step changed 2° → 1.5°, range 0–179 → 0–239.
       Existing nodes rotate differently. ([5.5](#55))
+      — audited 2026-07-30: **no node in the tree uses `degrotate` or `colordegrotate`**
+      as its `paramtype2`. The single grep hit in §7.1.2 was a `def.paramtype2 ==
+      "colordegrotate"` comparison in `default_tweaks`' item-drop code, not a
+      registration. No stored param2 can be affected.
 - [~] **[SILENT]** `use_texture_alpha` default became `"opaque"` for **nodebox and mesh** nodes.
       Transparent nodeboxes/meshes now render opaque unless you set it explicitly. ([5.9](#59))
       — **globally mitigated already** by the `alpha_workaround_minus` submodule, which
@@ -139,15 +178,46 @@ indistinguishable otherwise.
       band-aid — set `use_texture_alpha` per node and then retire it.
 - [ ] **[SILENT]** The `hand` inventory list now *entirely replaces* the hand, instead of
       only "enhancing" its tool capabilities. ([5.12](#512))
-- [ ] **[SILENT]** `set_physics_override{speed = x}` now scales acceleration too. ([5.8](#58))
-- [ ] **[SILENT]** HP clamping removed from `register_on_player_hpchange`. ([5.10](#510))
+- [~] **[SILENT]** `set_physics_override{speed = x}` now scales acceleration too. ([5.8](#58))
+      — audited 2026-07-30. **A much worse problem surfaced here: the positional form
+      `set_physics_override(speed, jump, gravity)` is already gone**, not merely
+      deprecated — the engine does `luaL_checktype(L, 2, LUA_TTABLE)` and no shim remains
+      in `builtin/`, so every positional call raised a `LuaError` and aborted its
+      callback. That had broken `beds` (sitting/rising), `playertools`
+      (`/setspeed`, `/setgravity`, `/setjump`) and `xdecor`'s sit/lay handler. Fixed;
+      see §7.4. Move it out of §6 "announced" — it has happened.
+      The acceleration half is **a tuning question, not a bug**: the 5 mods that pass
+      `speed` (`grenades_basic`, `playercontrol`, `sprint`, `spriteguns`, `3d_armor`)
+      now also accelerate players faster. Deliberately not changed — compensating means
+      choosing `acceleration_default` / `acceleration_air` values, which is a gameplay
+      decision, not a migration.
+- [x] **[SILENT]** HP clamping removed from `register_on_player_hpchange`. ([5.10](#510))
+      — audited 2026-07-30, all 5 handlers read; **no change needed**:
+      * `hudbars` ignores `hp_change` entirely.
+      * `3d_armor` only ever sets it to 0; magnitude-independent.
+      * `default_tweaks/falldamage` doubles it — now doubling an unclamped value, but a
+        lethal fall stays lethal.
+      * `medical/vitals` (the unconsciousness system) detects death with
+        `hp + hp_change <= 0`. This is the one that *looks* clamping-dependent and is
+        not: clamped it evaluated `5 + (-5) <= 0`, unclamped `5 + (-100) <= 0`. True
+        either way. **Do not "fix" this by re-clamping.**
+      * `medical/injuries` scales injury severity by `-hp_change`, so near-fatal hits now
+        produce more severe injuries. A gameplay consequence, arguably more correct.
+        (`math.random` with a sub-1 argument was checked and returns 1 under LuaJIT
+        rather than erroring, so the small-fall path is safe.)
 - [ ] **[SILENT]** Iterating `get_objects_inside_radius` while modifying the world can hand you
       invalid `ObjectRef`s → use `core.objects_inside_radius`. ([5.9](#59))
+      — **deliberately deferred 2026-07-30.** 63 sites, and in practice the pattern is
+      rarely a problem; the few that matter are cheaper to fix when playtesting surfaces
+      them than to triage cold. Not a blocker for anything else in this list.
 - [ ] **[SILENT]** Default `sky_color` values changed. ([5.5](#55))
 - [ ] **[SILENT]** `set_sky` skybox `textures` order is X+/X− then Z−/Z+ (docs were wrong before 5.9). ([5.9](#59))
 - [ ] **[SILENT]** LBM `run_at_every_load = false` never runs on mapblocks generated after the
       LBM's introduction; and no LBM can reliably modify mapgen output. ([5.12](#512), [5.16](#516))
-- [ ] **[SILENT]** HUD `text` element `scale` never worked — do not use it. ([master](#517-dev-master))
+- [x] **[SILENT]** HUD `text` element `scale` never worked — do not use it. ([master](#517-dev-master))
+      — removed from 8 `type = "text"` elements (`areas`, `cars`, `charactercreation`,
+      `email`, `medical` ×2, `vote` ×2) on 2026-07-30. Each was checked to belong to a
+      text element rather than a neighbouring definition. Pure no-op cleanup.
 
 ### 1.4 Session log
 
@@ -159,6 +229,7 @@ Append one line per working session so the next session knows where it stopped.
 | 2026-07-30 | §7.5 steps 1, 2 | `alpha_workaround_minus` submodule bumped `fc8f9df` → `a4f9749` (upstream HEAD). `.luacheckrc` `read_globals` extended: 3579 → 3341 warnings, W113 540 → 302, 0 errors (§7.1.1). The 302 survivors are now classified into a real bug queue (§7.1.1). |
 | 2026-07-30 | §7.6 | Upstream import protocol defined and `tools/verify-upstream-imports.sh` checked in (positive + both negative cases tested). No mod upgraded yet. Corrected `enable_shadows` upstream URL in §7.2.2. |
 | 2026-07-30 | §7.1.2, §7.5 | **Strategy change: fix deprecations directly, upgrade only where free.** Measured the whole deprecation surface (§7.1.2) — small, and concentrated in mods that have no upstream. §7.5 restructured around it; §7.3/§7.6 demoted to opportunistic and given the world-compatibility warning they were missing. |
+| 2026-07-30 | §7.5 steps 3–17, 20 | **The game did not boot on 5.17-dev; it does now.** Ran the log-driven pass for the first time (§7.5 step 3) and worked the sweeps and audits it generated. Two hard breakages found that grep could never have shown: `wiki` aborting at load on `ie.core.mkdir`, and the *removed* positional `set_physics_override` silently breaking `beds`, `playertools` and `xdecor`. Also fixed a decoration that never placed and a load-time `add_entity`. Mechanical sweeps: `minetest.env` (59), `initial_properties` (23 defs / 180 props), bone overrides, LMB/RMB, velocity/entity-name accessors, `weight`/`colors`, HUD text `scale`, media filenames. luacheck 3341 → 3338, still 0 errors. 10 commits. |
 
 ---
 
@@ -190,7 +261,7 @@ log a `deprecated` message.
 | `core.rollback_get_last_node_actor` | `core.rollback_get_node_actions(pos, range, secs, 1)[1]` | shim in builtin |
 | formspec `invsize[W,H;]` | `size[W,H]` | **[SOFT]** |
 | formspec inventory location `"current_name"` | `"context"` | **[SOFT]** |
-| `set_physics_override(num, num, num)` | table form | undocumented; slated for removal |
+| `set_physics_override(num, num, num)` | table form | **[BREAK]** — already gone. The engine does `luaL_checktype(L, 2, LUA_TTABLE)` and no shim survives in `builtin/`, so a positional call raises a `LuaError` and aborts the callback. Verified against 5.17-dev on 2026-07-30. Historical order was `(speed, jump, gravity)` |
 
 ---
 
@@ -1029,7 +1100,8 @@ any of it:
   `get/set_fog`.
 * `depends.txt` / `description.txt` will be removed outright.
 * The moon texture will be rotated 180° to match the sun.
-* `set_physics_override(num, num, num)` will be removed.
+* ~~`set_physics_override(num, num, num)` will be removed.~~ **Already removed** — it is
+  a hard error today, not a future breakage. See the legacy table in §2 and §1.3.
 * `${key}` substitution in metadata values will be removed.
 * `old_move` will be removed; `physics_override.sneak` will stop affecting speed.
 * `use_texture_alpha` will be harmonised between entities and nodes, default `"opaque"`,
@@ -1182,6 +1254,30 @@ main line of work rather than a fallback (§7.5).
 `^\s*colors *=` hits are probably mostly false positives — `weight` is also a mob-spawn and
 biome field, and `colors` is used by unrelated APIs. They are omitted from the table above
 for that reason; check them by hand before treating either as a fix.
+
+#### What the 2026-07-30 sweep proved about these numbers
+
+The raw counts above are **call sites, not violations**, and the gap was large enough to
+change how much work several items were. Recorded so the next estimate starts from truth:
+
+| Item | Raw count | Actual violations | Why |
+|---|---|---|---|
+| `set_player_privs` | 28 / 10 | **1** | 19 of 20 revocations already passed `nil`, which never warns |
+| `use_texture_alpha = bool` | 7 / 5 | **2** (both unreachable, submodule) | 4 are `register_entity`, where the field is a legitimate boolean |
+| `set_bone_position` | 5 / 3 | **2** | 1 commented out, 1 a stub in a fake player |
+| `get_entity_name` | 5 / 5 | **3** | 2 inside comment blocks |
+| `weight` | 22 | **7** | rest are `gas_lib`'s buoyancy field and a local variable |
+| `degrotate` | 1 | **0** | a string comparison, not a registration |
+| `get_player_velocity` | 8 / 8 | **7** | 1 comment |
+
+The lesson generalises: **grep the tree, then read every hit before costing the item.**
+Comment blocks (`--[[ … ]]`) are the single biggest source of phantom work here —
+`medical/tools.lua` alone hides two whole entity definitions inside one.
+
+Conversely, the log-driven pass found **five real problems that no grep in this section
+would ever have produced**, including the two that stopped the game booting or silently
+broke three mods. Greps enumerate a known list; only running the engine finds the unknown
+one.
 
 Re-run with:
 
@@ -1431,6 +1527,16 @@ Record diff outcomes here, including negative results.
 |---|---|---|---|---|
 | _(all)_ | not started | no | — | Repo-wide commits so far: `09cecc8d` (TileDef `image`→`name`), `ee1815e1` (`get_connected_players` at load time), `b6a49a94` (`getpos`→`get_pos`), `0cf5fa2a` (player meta instead of `[gs]et_attribute`), `01319573` (removed overridden mesecons playerdetector) |
 | `alpha_workaround_minus` | **at upstream HEAD** | yes — submodule, no local commits on top | — | Bumped `fc8f9df` → `a4f9749` on 2026-07-30. Clean fast-forward, no local customizations to re-apply. Still a band-aid: retire it once `use_texture_alpha` is set per node (§1.3, §7.5 step 8). |
+| `wiki` | fixed | no | §1.1 | **Was aborting the whole game at load.** `ie.core.mkdir` is nil — the insecure environment carries no `core`. Now uses the sandboxed `core.mkdir`, which is fine because every path it creates is under `get_worldpath()`. |
+| `beds`, `playertools`, `xdecor` | fixed | no | §1.3 | Positional `set_physics_override` is **removed**, so beds' sit/rise, `/setspeed`, `/setgravity`, `/setjump` and xdecor's sit/lay were all raising `LuaError`. Rewritten to table form **from each call's intent**, not from the old argument order — `playertools` had passed gravity 2nd and jump 3rd against an API that was `(speed, jump, gravity)`, so those two commands had been setting each other's value. |
+| `spood` | fixed | no | — | `num_spawn_by = 1` with no `spawn_by`: registration only warns, but `canPlaceDecoration` then counts 0 neighbours against a required 1, so `farming:spood_8` never generated. |
+| `display_modpack` | fixed | no | — | `is_rotation_restricted()` spawned a dummy entity to probe for `set_rotation`, and `signs_api` called it from its main chunk, so `add_entity` ran during script init where the engine refuses it. Probe and the legacy `on_rotate` override it gated both removed. |
+| `character_anim` | migrated, **needs visual check** | no | §1.2 bone API | Degrees→radians conversion happens at one boundary; the mod is degrees throughout. Its monkeypatch of `PlayerRef.set_bone_position` is **kept on purpose** — it exists to track third-party callers of the deprecated method — but forwards to `set_bone_override`. A headless server exercises none of this: the failure mode is wrong limb angles, which needs a client. Upstream is LMD/character_anim, so the fix should go upstream too. |
+| `cars` | partly migrated | no | §1.1, §1.2 | Steering bone → `set_bone_override`; `weight` removed (6 sites incl. `newcars.lua`, `car01.lua`); `get_node_group`, velocity and LMB accessors. Note the `set_attach` call next to the bone override still takes **degrees**. |
+| `controls` + `medical` | migrated together | no | §1.2 | Not separable. `controls` tracked `LMB`/`RMB` *and* `dig`/`place`, firing duplicate press/release events; `medical`'s `cancel_on_release` matches the emitted key names, so dropping the legacy pair required renaming medical's `"LMB"`/`"RMB"` strings in the same commit. `medical` is the only consumer. |
+| `mobs_redo` | **deferred** | no | — | 3 entity defs left on the bare table. It is a framework: defs are built dynamically, and `self.hp_max` / `self.collisionbox` / `self.nametag` / `self.textures` are read as *mutable instance state* across `api.lua` and every `mobs_farm` mob (~80 sites in two mods). Nesting them changes lookup semantics everywhere. Needs its own pass, not a sweep. |
+| `3d_armor-version-0.4.11` | **deferred** | no | §1.2 partial | `3d_armor_stand`'s entity def left unmigrated on purpose: §7.5's sequencing trap says not to hand-fix a mod slated for rebase (step 23). It did receive the 4-line `minetest.env` sed and the velocity rename — trivial, and upstream will already have both, so a future import should mark them `dropped`. |
+| `cooking`, `cooking_fr` | **blocked (submodule)** | no | — | The only remaining real `use_texture_alpha = true` hits (7 nodes, all `drawtype = "mesh"` → `"blend"`), and the only two mods lacking `mod.conf` / still carrying `depends.txt`. Both need an upstream commit or a fork; a parent-repo edit cannot be recorded (§7.6). |
 
 ### 7.5 Order of attack
 
@@ -1470,7 +1576,7 @@ decide that one before touching it.
 
 #### Generate the queue
 
-- [ ] 3. **Log-driven pass — do this first, it is now the primary work-generator.**
+- [~] 3. **Log-driven pass — do this first, it is now the primary work-generator.**
       `debug_log_level = info`, default `deprecated_lua_api_handling = log`. Start a
       headless server: that alone exercises every `register_*` call and surfaces most of
       §1.2 plus all of §1.1's hard errors, with backtraces to exact call sites, before any
@@ -1478,41 +1584,82 @@ decide that one before touching it.
       digilines, armour, jobs) for the runtime-only paths. Unexercised code stays silent,
       so this complements §7.1.2's greps rather than replacing them.
 
+      **Load-time half done 2026-07-30, and it paid for itself immediately: the game did
+      not boot.** How to re-run it (~2 s of mod loading; a 20 s `timeout` is plenty):
+
+      ```sh
+      luanti --server --world <throwaway> --gameid citysim_game \
+             --config <conf> --logfile <log>
+      ```
+
+      The config needs `secure.trusted_mods = irc,modlib,wiki` or `wiki` aborts on its
+      `request_insecure_environment` assert, and `mg_name = singlenode` keeps it fast.
+      Exit code 124 from `timeout` means the server stayed up, i.e. every mod loaded.
+      **Truncate the log between runs** — it is appended to, so stale errors from an
+      earlier failed boot otherwise look current.
+
+      Found, none of which grep could have shown: `wiki`'s `ie.core.mkdir` (fatal),
+      positional `set_physics_override` (§1.3), `spood`'s dead decoration,
+      `display_api`'s load-time `add_entity`, and two media files with illegal names.
+
+      **Still to do: the gameplay half.** Everything reached only by playing — the 63
+      `get_objects_inside_radius` sites, entity `self.foo` property reads, bone animation
+      — stays silent under a bare boot.
+
 #### Mechanical sweeps — counts from §7.1.2
 
-- [ ] 4. `core.env:foo()` → `core.foo()`. 59 hits / 14 files, mostly `beer_test`.
-- [ ] 5. Entity definitions → `initial_properties`; read via `self.initial_properties.x`.
-      29 files across 23 mods. Check `weight`/`colors` by hand here (§7.1.2 caveat).
-- [ ] 6. `use_texture_alpha = true/false` → `"opaque"`/`"clip"`/`"blend"`. 7 hits / 5 files.
-- [ ] 7. `get_player_velocity`/`add_player_velocity` → `get_velocity`/`add_velocity`. 7 / 7.
-- [ ] 8. `get_entity_name()` → `get_luaentity().name`. 5 / 5.
-- [ ] 9. `get_node_group` → `get_item_group`. 1 / 1.
-- [ ] 10. Delete the one `*_normal.png`; `.bmp` count is already zero.
-- [ ] 11. `LMB`/`RMB` → `dig`/`place`; `up`/`down`/`left`/`right` → `movement_x`/`movement_y`.
-      9 / 6. Likely `playercontrol`, `controls`, `sprint`, `cars`.
+- [x] 4. `core.env:foo()` → `core.foo()`. 59 hits / 14 files, mostly `beer_test`. Zero left.
+- [~] 5. Entity definitions → `initial_properties`. **23 of 27 defs done** (180 properties,
+      18 mods); `mobs_redo` ×3 and `3d_armor_stand` deferred, see §7.4. The `weight`/`colors`
+      caveat resolved: both were real here and are now gone, but most raw grep hits were
+      false positives. No migrated mod needed `self.initial_properties.x` rewrites — only
+      `anticombatlog` and `bones_entity` read these off `self`, and both write them from
+      staticdata before any read.
+- [~] 6. `use_texture_alpha = true/false` → `"opaque"`/`"clip"`/`"blend"`. **Nothing to do
+      in-tree.** 4 of the 7 hits are `register_entity`, where the field is a boolean object
+      property and *not* deprecated; 1 is commented out; the 2 real ones are in the
+      `cooking` submodule (§7.4). Note `true` → `"clip"` for `drawtype = "normal"` but
+      `"blend"` otherwise — it is not a blanket rename.
+- [x] 7. `get_player_velocity`/`add_player_velocity` → `get_velocity`/`add_velocity`. 7 live
+      sites; the 8th was a comment in `pipeworks`.
+- [x] 8. `get_entity_name()` → `get_luaentity().name`. 3 live sites (2 were in comment
+      blocks, 1 in the `cooking` submodule). Each keeps a nil guard — the engine returns
+      nil for anything that is not a Lua entity, which is also why the `not obj:is_player()`
+      guards those call sites had were redundant.
+- [x] 9. `get_node_group` → `get_item_group`. 1 / 1.
+- [x] 10. Deleted `medical/textures/temp_normal.png`; `.bmp` count was already zero. Also
+      dropped two media files the engine was refusing for illegal characters.
+- [x] 11. `LMB`/`RMB` → `dig`/`place`. Zero left. **This was not a rename**: `controls` and
+      `medical` had to change together (§7.4). The `up`/`down`/`left`/`right` →
+      `movement_x`/`movement_y` half is **not** done — it is a separate, larger change and
+      those fields are not deprecated, merely superseded for joystick support.
 - [ ] 12. `mod.conf` for `mods/cooking` and `mods/cooking_fr` (the only two left, both
       submodules); delete their `depends.txt`.
 
 #### Audits — no warning will fire, each needs judgement
 
-- [ ] 13. `set_bone_position` → `set_bone_override` in `cars`, `frisk`, `character_anim`.
-      Only 5 call sites, but **degrees→radians and `absolute` defaults to false** — the
-      easiest item here to get silently wrong.
+- [x] 13. `set_bone_position` → `set_bone_override` in `cars` and `character_anim` (`frisk`'s
+      is commented out). Done 2026-07-30. **`character_anim` is unverified visually** — see
+      §7.4 before assuming this item is closed.
 - [ ] 14. `get_objects_inside_radius` → `core.objects_inside_radius`. 63 hits / 41 files, but
-      only the call sites whose loop body mutates the world are actually unsafe. Triage
-      rather than sweeping; the log-driven pass shows which ones run hot.
-- [ ] 15. `set_physics_override` — the 5.8 change makes `speed` scale acceleration too.
-      22 hits / 11 files.
-- [ ] 16. `set_player_privs` — pass a set of `true` values, or use `change_player_privs`.
-      28 hits / 10 files.
-- [ ] 17. `register_on_player_hpchange` — HP clamping removed in 5.10. 5 / 5.
-- [ ] 18. `liquid_alternative_*` completeness on every custom liquid
-      (`dynamic_liquid`, `waterworks`, `static_ocean`, `oil`, `gas_lib`, `bucket`).
-      Missing values are a **hard registration error** since 5.12, so item 3 catches these.
-- [ ] 19. Any file writes into mod directories — hard error since 5.16, so item 3 catches
-      these too.
-- [ ] 20. The single `degrotate` hit — rotation step changed 2° → 1.5° in 5.5, so stored
-      param2 in existing worlds renders differently.
+      only the call sites whose loop body mutates the world are actually unsafe.
+      **Deliberately deferred 2026-07-30**: in practice this rarely bites, and the few sites
+      that do are cheaper to fix when playtesting hits them than to triage cold.
+- [x] 15. `set_physics_override`. Done 2026-07-30, but **not the item as written** — the
+      real finding was that the *positional* form is already removed and was breaking three
+      mods outright. The 5.8 acceleration change is a tuning decision, left alone. See §1.3.
+- [x] 16. `set_player_privs`. One violating site out of 20 revocations; the rest already
+      passed `nil`. The "28 hits" counted call sites, not violations.
+- [x] 17. `register_on_player_hpchange` — audited, **no change needed**; reasoning per
+      handler recorded in §1.3, including why `medical`'s `hp + hp_change <= 0` death check
+      is *not* clamping-dependent.
+- [x] 18. `liquid_alternative_*` completeness — verified by item 3, as predicted: a missing
+      value is a hard registration error and the boot is clean.
+- [x] 19. Any file writes into mod directories — verified: all `get_modpath()` file access
+      is read-mode; the write-mode ones are commented out. `wiki` writes under the world
+      path, which is allowed.
+- [n/a] 20. `degrotate` — no node in the tree uses that `paramtype2`. The lone grep hit was
+      a string comparison. No stored param2 can be affected.
 
 #### Opportunistic, not scheduled
 
@@ -1521,7 +1668,9 @@ decide that one before touching it.
 - [ ] 22. Upgrade any mod that anchors `exact-tree-match` under §7.6 — free modernization,
       one verified commit, no judgement required.
 - [ ] 23. **`3d_armor` 0.4.11 → current**, if items 4–20 leave it looking worse than a
-      rebase. 43 focused commits; budget real time.
+      rebase. 43 focused commits; budget real time. It came out of items 4–20 nearly
+      untouched — only a `minetest.env` sed and a velocity rename, both of which upstream
+      will already have — so nothing has been sunk into it and the rebase case is unchanged.
 - [ ] 24. **Identify the unidentified mods** (§7.2.3) by title/description search on
       ContentDB. Lower value now that upgrading is demoted, but it still converts guesswork
       into a known upstream when a mod misbehaves.
