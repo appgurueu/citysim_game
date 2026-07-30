@@ -1411,7 +1411,22 @@ reading thousands of lines of upstream churn. **Follow this for every mod upgrad
 #### Branch
 
 One branch per mod, pushed to the `fork` remote (`appgurueu/citysim_game`), matching convention `upgrade/<modname>`. One mod per
-branch means a bad upgrade is reverted without blocking the other eighteen.
+branch means a bad upgrade is reverted without blocking the other eighteen. The `upgrade/`
+prefix also keeps batch-produced branches distinguishable from hand-made ones (`controls`,
+`upgrade-cmdlib`, `fix/…`).
+
+**Push rules — hard limits, not preferences:**
+
+| | |
+|---|---|
+| Allowed | `git push fork upgrade/<modname>` — creating a **new** branch on `fork` |
+| Forbidden | pushing to `origin` **at all**. It is `Elkien3/citysim_game`, the upstream project — not ours |
+| Forbidden | `--force` / `--force-with-lease` anywhere, and pushing to any branch that already exists |
+| Forbidden | pushing `master`, `maintenance`, tags, or deleting any ref |
+
+If a branch needs to change after it is pushed, add a commit or push a new branch under a
+different name. Never rewrite a pushed branch — a reviewer who has already read commits 1–4
+must be able to trust that those commits still say what they said.
 
 #### Commit 1 — the fetch. Verify it, do not read it.
 
